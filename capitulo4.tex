@@ -1,0 +1,711 @@
+\chapter{Metadatos}
+
+En este cap'itulo se har'a muestra de las t\'ecnicas necesarias para obtener la estructura de una base de datos, una base de datos existente por lo general lleva tablas que de alguna manera se relacionan entre ellas. El detallar la estructura de una base de datos comprende:
+\begin{itemize}
+\item listar todas las tablas de una base de datos.
+\item listar las tablas que hacen referencia y a que tablas.
+\item listar las llaves primarias de una tabla.
+\item listar las llaves for\'aneas de una tabla.
+\item detallar una tablas como ser el tipo de dato, tama\~no, si puede ser nulo etc... 
+\end{itemize} 
+Es muy importante realizar lo listado anteriormente para obtener la estructura de una base de datos, y usar estos resultados para construir una interfaz gr\'afica de configuraci\'on de generaci\'on de datos de acuerdo a las caracter\'isticas de la columna de una tabla.
+Obtener de la estructura de una base de datos puede variar dependiendo del DBMS(Database Managment System) con la que trabajemos, entre los DBMS tenemos a varios entre las mas usadas est\'an MySQL, PostgreSQL, Oracle, SQLServer y otras. En este proyecto se hace la eleccion de  trabajar con postgresSQl las razones para esta elecci\'on son las siguientes.
+\begin{itemize}
+\item Soporta llaves primarias compuestas(lo cual nos permite aplicar patrones de dise\~no ER Idioms).
+\item Es un DBMS de licencia BSD libre.
+\end{itemize}
+Esto no significa que en las otras no se puedan aplicar este proyecto de lo contrario son aplicables a DBMS relacionales claro que existen diferencias de como manejan los datos internamente cada una de ellas por ejemplo mencionar que postgreSQL los almacena en metadatos todas las tablas que creamos, por lo tanto podemos deducir que para obtener la estructura de una base de datos es necesario trabajar con los metadatos de postgreSQL.
+\section{Metadatos en PostgreSQL}
+PostgreSQL tiene una arquitectura que involucra muchos estilos, en su nivel mas alto es un esquema cl\'asico cliente-servidor, mientras que el acceso a metadatos es un esquema en capas.
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[scale=0.25]{images/arquitecturaPostgres}}
+\caption{Arquitectura PostgreSQL} \label{fig:ArquitecturaPostgres}
+\end{figure}
+\begin{itemize}
+\item Libpq es el responsable de manipular las comunicaciones entre la aplicaci\'on cliente y el postmaster(Servicio del PostgreSQL en el servidor).
+\item El servidor esta compuesto por dos grandes subsistemas, "Postmaster" que es el responsable de aceptar las comunicaciones con el cliente, autentificar y dar acceso. "Postgre" se encarga de la administraci\'on de los consultas(querys) y comandos enviados por el cliente. PostgreSQL trabaja bajo el concepto de "process per user", eso significa un solo proceso cliente por conexi\'on. Tanto el Postmaster como el Postgre deben estar junto en el mismo servidor siempre.
+\item El gestor de almacenamiento(Storage Manager) es responsable de la administraci\'on general del almacenamiento de los datos, controla todos los trabajos del back end incluido la administraci\'on del buffer, archivos, bloqueos y control de consistencia de la informaci\'on.   
+\end{itemize}
+\subsection{Almacenamiento y organizaci\'on de datos}
+Los datos siempre se va guardar en ``disco" (esto puede no ser literalmente un Hard Drive).
+Esto genera un intenso trabajo de I/O, cuando leemos la data la sacamos de ``disco" para pasarla a la RAM, cuando escribimos la bajamos de la RAM al ``disco".
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[scale=0.4]{images/almacenamientoorganizaciondatos}}
+\caption{Almacenamiento y Organizacion de datos} \label{fig:almacenamientoorganizaciondatos}
+\end{figure}
+PostgreSQL posee un ``Storage Manager" (MySql tiene 5 o m\'as por ejemplo), esta compuesto por varios m\'odulos que proveen administraci\'on de las transacciones y acceso a los objetos de la base de datos.
+
+Los m\'odulos se programaron bajo tres lineamientos bien claros:
+\begin{itemize}
+\item Manejar transacciones sin necesidad de escribir c\'odigo complejo de recuperaci\'on en caso de ca\'idas.
+\item Mantener versiones hist\'oricas  de la data bajo el concepto de ``graba una vez, lee muchas veces".
+\item Tomar las ventajas que ofrece el hardware especializado como multiprocesadores, memoria no vol\'atil, etc.  
+\end{itemize}
+\subsubsection{Los 'indices}
+Cada tipo de b\'usqueda tienen un tipo de \'indice adecuado para trabajarla, b\'asicamente un \'indice es un ``archivo" donde est'a parte de un dato y estructura de una tabla con ``search key" de b\'usqueda.\\
+\subsection{Como se procesa un consulta(Query)}
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[scale=0.25]{images/comoprocesaquery}}
+\caption{Como se procesa un query} \label{fig:comoprocesaquery2}
+\end{figure}
+
+Luego pasa por:
+ 
+\lstset{language=sql,breaklines=true}
+\begin{lstlisting}
+FindExec: found "/var/local/postgres/ ./bin/postgres" using argv[0]
+DEBUG: connection: host=[local] user=postgres database=test
+DEBUG: InitPostgtres
+DEBUG: StartTransactionCommand
+DEBUG: query: SELECT firstname
+			  FROM friend
+			  WHERE age = 33;
+			  
+[query is proceesd]			  	
+
+DEBUG: ProcessQuey
+DEBUG: CommitTransactionCommand
+DEBUD: proc_exit(0)
+DEBUG: shmen_exit(0)
+DEBUG: exit(0)
+\end{lstlisting}
+ 
+ \begin{itemize}
+ \item Un identificador de reglas de que lo escrito sea sint\'acticamente entendible, que los d\'igitos y los n\'umeros sean reconocibles.
+ \item Luego se descompone ``palabra$"$ a ``palabra$"$ el query, para pasar a la estructura que le corresponde seg\'un el query, en este caso a la estructura de un \texttt{SELECT}, esto se ve asi:
+\end{itemize}
+\lstset{language=sql,breaklines=true}
+\label{fig:codigosqlc}
+\begin{lstlisting}
+simple_select: SELECT opt_distinc target_list
+			 into_clause from_clause where_clause
+			 group_clause having_clause
+			 [
+			 	SelectStmt *n = makeNode(SelectStmt);
+			 	n->distincClause = $2;
+			 	n->targetList = $3;
+			 	n->istemp = (bool)((Value *| lfirst($4)))->val.ival;
+			 	n->into = (char*) lnext($4);
+			 	n->fromClause = $5;
+			 	n->whereClause = $6;
+				n->groupClause = $7;
+				n->havingClause = $8;
+				$$ = (Node)n;			 	
+			 ]	
+\end{lstlisting}
+
+\lstset{language=c,breaklines=true}
+\begin{lstlisting}
+typedef struct SelectStmt
+{
+	NodeTag	type;
+	List *distincClause;
+	
+	char *into;
+	bool istemp;
+	List *targetList;
+	List *fromClause;
+	Node *whereClause;
+	List *groupClause;
+	Node *havingClause;
+	
+	List *sortClause;
+	char *portalname;
+	bool binary;
+	Node *limitOffset;
+	Node *limitCount;
+	List *forUpdate;
+	
+	SetOperartion op;
+	bool all;
+	struct SelectStmt *larg;
+	struct SelectStmt *rarg;		
+} SelectStmt;	
+\end{lstlisting}
+
+\subsubsection{M\'etodos para relacionar tablas}
+\subparagraph{Nested loop join}
+Consume mas recursos de memoria pero la cantidad de b\'usquedas a realizar a realizar es menor.\\
+\subparagraph{Merge join}
+Requiere que a data este ordenada para ubicar las relaciones, el costo esta justamente en mantener la data ordenada.
+\subparagraph{Hash join}
+Aparentemente ser\'ia la forma mas r\'apida de acceder a un dato gracias a la creaci\'on de tablas indexadas, pero limitada a una b\'usqueda de igualdad. Las combinaciones hash requerir'a una combinaci'on de igualdad predicado (un predicado comparaci'on de los valores de una tabla con los valores de la otra tabla utilizando el operador igual $`='$),las combinaciones hash tambi'en puede ser evaluado por un predicado anti-join (un predicado seleccionar valores de una tabla cuando no hay valores relacionados se encuentran en el otro). Dependiendo de los tama\~nos de las tablas, diferentes algoritmos se pueden aplicar.
+
+El ``Executor" toma el plan de ejecuci\'on que el ``planer" le entrega e inicia el procesamiento, ejecuta un ``plan tree".
+Este ``plan tree" tiene varios nodos de ejecuci\'on que se van ejecutando uno a uno y de cada uno de ellos se obtiene un set de datos(tuplas). Los nodos tienen subnodos y otros a su vez otros subnodos, tantos como sea necesario.
+\section{Obtener la estructura de una base de datos}
+En este caso requerimos obtener una estructura de informaci\'on con detalles por cada columna de una tabla semejante a esta:
+
+\texttt{column\_name} $=>$ \texttt{cedula},
+ 
+\texttt{datatype} $=>$ \texttt{integer}, 
+
+\texttt{key} $=>$ \texttt{PRI},
+
+\texttt{is\_nullable} $=>$ \texttt{NO},
+
+\texttt{max\_length} $=>$ \texttt{8}, 
+
+\texttt{column\_default} $=>$
+
+Podemos observar el detalle de un atributo de una tablas por lo tanto podemos hacerlo para cada una y donde:
+
+\texttt{datatype}: es un tipo de dato interno de postgresql.
+
+
+key: \texttt{UNI} = \texttt{unique}, el campo es un \'indice \'unico.
+
+ 
+key:	 \texttt{PRI} = \texttt{primary key}, el campo es un \'indice primario, 
+
+key:	 \texttt{FK} = \texttt{foreign key}, el campo es un \'indice de una llave for\'anea.
+
+max\_length: Si el campo es integer, muestra la precisi\'on del entero (2,4,8), si es un varchar, la longitud en caracteres (ej. 75).
+
+column\_default: muestra el tipo de valor por defecto de la tabla; si la tabla es serial, veremos la llamada al nextval de la secuencia: ej. nexval(‘personas\_cliente\_id\_seq'::regclass). Lo que nos permite determinar que campo de nuestra tabla es serial (auto-incremental).
+
+\subsection{Obtener el detalle de una tabla} 
+Para entender cada tabla del \textbf{pg\_catalog} debe ser interrogada con el \textbf{oid} de la tabla, que lo sacamos de \textbf{pg\_class}.
+Los campos y sus atributos, los sacamos de la tabla \textbf{pg\_attribute}.
+El tipo de datos lo sacamos de la tabla \textbf{pg\_type}
+los constraints de la tabla los obtenemos de la tabla \textbf{pg\_constraint}
+y el valor por defecto, lo sacamos de la tabla \textbf{pg\_attrdef}.
+La sentencia construida para sacar esa informaci'on de una sola vez de todas las tablas es esta:
+\subsubsection{Usando OIDs}
+\lstset{language=sql,breaklines=true}
+\label{SQLDetalleTablaMetodo1}
+\captionof{lstlisting}{Query para obtener detalle tabla con OIDs}
+\begin{lstlisting}
+SELECT pgca.attname as column_name,
+	      t.typname as data_type,
+CASE
+		   WHEN cc.contype='p' THEN 'PRI'
+		   WHEN cc.contype='u' THEN 'UNI'
+		   WHEN cc.contype='f' THEN 'FK'
+		   ELSE '' 
+END AS key,	
+CASE 
+		   WHEN pgca.attnotnull=false THEN 'YES' 
+ELSE    'NO' 
+END AS is_nullable,
+CASE 
+		   WHEN pgca.attlen=-1 THEN(pgca.atttypmod-4) 
+		   ELSE pgca.attlen 
+END as max_length,
+d.adsrc as column_default
+FROM	 pg_catalog.pg_attribute pgca
+		   LEFT JOIN pg_catalog.pg_type t ON
+			    t.oid=pgca.atttypid
+		   LEFT JOIN pg_catalog.pg_class c ON
+			    c.oid=pgca.attrelid
+		   LEFT JOIN pg_catalog.pg_constraint cc ON 
+			    cc.conrelid=c.oid AND 
+			    cc.conkey[1]=pgca.attnum
+		   LEFT JOIN pg_catalog.pg_attrdef d ON
+			    d.adrelid=c.oid AND 
+			    pgca.attnum=d.adnum
+WHERE c.relname='TABLA' AND
+	  pgca.attnum>0 AND
+	  t.oid = pgca.atttypid.
+\end{lstlisting}
+Donde $<$TABLA$>$ representa el nombre de la tabla a la que queremos interrogar para obtener sus metadatos.
+Si el modelo de la Figura \ref{fig:Modelo ER} llevamos al gestor de base de datos en este caso PostgreSQL y hacemos uso del c\'odigo de Figura \ref{SQLDetalleTablaMetodo1}  obtendremos algo similar a la siguiente imagen. 
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[width=150mm,height=30mm]{images/resDetalleMet1}}
+\caption{Detalle tabla OIDs} \label{fig:Detalle Metodo 1}
+\end{figure}
+Donde:
+\begin{itemize}
+\item \emph{column\_name} muestra en nombre del columna de la tabla.
+\item \emph{data\_type} indica que tipo que almacena esta columna.
+\item \emph{key} indica si es una llave sea primaria, for\'anea o sea \'unico.
+\item \emph{is\_nullable} nos indica si este campo puede ser nulo.
+\item \emph{max\_length} indica el tama\~no de memoria de informaci\'on m\'axima.
+\item \emph{colum\_default} en este campo nos indica si es autoincremental en PostgreSQL(serial, bigserial y smallserial) que normalmente se suele usar en llaves primarias las cuales no son obligatorias insertar ya que el DBMS se encarga de realizarlo por nosotros.
+\end{itemize}
+Son algunos campos almacenadas en el metadato de las muchas que se puede obtener y depende de lo que necesitemos saber, las listadas son b\'asicas sobre la informaci\'on detallada de una determina tabla de una base de datos. El query de la Figura \ref{fig:Detalle Metodo 1} para obtener los metadatos de una tabla no siempre tiene que ser de esa manera podemos hacerlo tambi\'en de la siguientes forma:
+\subsubsection{Usando Information schema}
+PostgreSQL  a partir de la versi'on 8.0 introdujo el \texttt{INFORMATION\_SCHEMA}. Las vistas definidas en el \texttt{INFORMATION\_SCHEMA} le dan acceso a la informaci'on almacenada en las tablas del sistema PostgreSQL. El \texttt{INFORMATION\_SCHEMA} se define como parte del estandar \texttt{SQL} y encontrar'as un \texttt{INFORMATION\_SCHEMA} en sistemas de bases de datos m'as comerciales (y algunos de c'odigo abierto).Por ejemplo, para ver una lista de las tablas definidas en la base de datos actual, puede ejecutar el comando:
+\lstset{language=sql,breaklines=true}
+\label{SQLDetalleTablaMetodo2}
+\captionof{lstlisting}{Query para detalle obtener el detalle de una tabla information scheme}
+\begin{lstlisting}
+SELECT tc.column_name,
+       data_type,
+       character_maximum_length,
+       numeric_precision,
+       is_nullable,
+       tcs.constraint_type,
+       column_default,
+       check_clause
+FROM information_schema.columns AS tc
+     LEFT OUTER JOIN
+        information_schema.constraint_column_usage AS cc
+     	ON tc.table_name = cc.table_name AND
+        tc.column_name = cc.column_name
+     LEFT OUTER JOIN
+        information_schema.table_constraints AS tcs
+     	ON tcs.constraint_name = cc.constraint_name
+     LEFT OUTER JOIN
+        information_schema.check_constraints AS cccs
+     	ON cccs.constraint_name = tcs.constraint_name
+WHERE tc.table_name = 'NOMBRE DE LA TABLA' AND
+      tc.table_schema = 'public' AND
+     (tcs.constraint_type='PRIMARY KEY' OR 
+      tcs.constraint_type='CHECK' OR 
+      tcs.constraint_type ISNULL)
+ORDER BY ordinal_position;
+\end{lstlisting}
+En esta consulta \texttt{SQL} podemos ver las diferencias con la anterior, en esta ya no hacemos uso de los \texttt{OIDS} las tablas que son parte del metadato que usamos son:
+
+\lstset{language=sql,breaklines=true}
+\begin{lstlisting}
+SELECT * FROM information_schema.columns
+SELECT * FROM information_schema.constraint_column_usage
+SELECT * FROM information_schema.table_constraints
+SELECT * FROM information_schema.check_constraints
+\end{lstlisting}
+Como resultado tenemos la siguiente informaci\'on:
+
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[width=150mm,height=30mm]{images/resDetalleMet2}}
+\caption{information schema} \label{fig:Detalle Metodo 2}
+\end{figure}
+Donde:
+\begin{itemize}
+\item \emph{column\_name} muestra en nombre del columna de la tabla.
+\item \emph{data\_type} indica el tipo de datos que esta permitido insertar, si comparamos con resultados de la figura \ref{fig:Detalle Metodo 1} aqu\'i nos devuelve el tipo de dato(integer en lugar de int4) como definimos en el modelo de la Figura \ref{fig:Modelo ER} Modelo ER.
+\item \emph{constraint\_type} indica si es una llave sea primaria, for\'anea o sea \'unico.
+\item \emph{is\_nullable} nos indica si este campo puede ser nulo.
+\item \emph{character\_max\_length} indica el tama\~no de memoria de informaci\'on m\'axima.
+\item \emph{colum\_default} en este campo nos indica si es autoincrementable en PostgreSQL(serial, bigserial y smallserial) que normalmente se suele usar en llaves primarias las cuales no son obligatorias insertar ya que el DBMS se encarga de realizarlo por nosotros.
+\item \emph{check\_clause} en esta columna nos muestra si es campo tiene restricciones sobre la inserci\'on de datos ejemplo: podemos decidir si queremos registrar edades entre 18 a 60 a\~nos. 
+\item \emph{numeric precision} nos indica el tama\~no del tipo, aparte de pertenecer a un cierto tipo en los DBMS suelen tener tipos de datos mas precisos.  
+\end{itemize}
+\subsection{Obteniendo las relaciones entre las tablas}
+La estructura de las relaciones entre tablas en una base de datos es el resultado de su modelo ER, donde las relaciones en PostgreSQL son representas por \textit{constraints} en un sistema gestor de base de datos.
+\lstset{language=sql,breaklines=false}
+\label{SQL Tablas que referencian}
+\captionof{lstlisting}{Query para obtener el detalle de referencias}
+\begin{lstlisting}
+SELECT (SELECT relname
+        FROM pg_catalog.pg_class c
+        	LEFT JOIN pg_catalog.pg_namespace n ON
+		       n.oid = c.relnamespace
+        WHERE c.oid=r.conrelid) as tablas,
+        conname,
+        pg_catalog.pg_get_constraintdef(oid, true) as ref 
+FROM pg_catalog.pg_constraint r 
+WHERE r.conrelid 
+	  IN(SELECT c.oid 
+		    FROM pg_catalog.pg_class c LEFT JOIN
+           pg_catalog.pg_namespace n ON 
+		         n.oid = c.relnamespace 
+      WHERE c.relname !~ 'pg_' AND 
+            c.relkind = 'r' AND 
+            pg_catalog.pg_table_is_visible(c.oid)) AND 
+r.contype = 'f'
+\end{lstlisting}
+De alguna manera necesitamos saber mediante un script las relaciones entre tablas de una base de datos, que tablas se relaci\'on con otra y exactamente que columnas est\'an involucradas, al decir las columnas involucradas nos referimos exactamente a las columnas de una determinada tabla que son las llaves for\'aneas y que estas existen en la tabla que es referenciada, Es lo que precisamente el sript nos da como resultado mostrado en la Figura \ref{fig:Referencias entre tablas}.
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[width=150mm,height=45mm]{images/resReferencias}}
+\caption{Referencias entre tablas} \label{fig:Referencias entre tablas}
+\end{figure}
+En la Figura \ref{fig:Referencias entre tablas} tenemos el resultado de las tablas que llegan a referenciar a otra y las tablas que son referenciadas donde:
+\begin{itemize}
+\item \textbf{tablas} Nos muestra la lista de tablas que hacen referencia, puede encontrarse que el nombre de una tabla llegue a repetirse en mas de una ocasi\'on no es un problema, detallaremos despu\'es de ver la explicaci\'on de la tercera columna.   
+\item \textbf{conname} Muestra el \texttt{CONSTRAINT} de la relaci\'on, que seria algo como en nombre de la relaci\'on entre las tablas involucradas. 
+\item \textbf{referencias} En esta columna de la Figura \ref{fig:Referencias entre tablas} nos trae toda la informaci\'on necesaria para ser usado. Analicemos una de ellas.
+\lstset{language=sql,breaklines=true}
+\begin{lstlisting}
+"FOREIGN KEY (cod_producto) REFERENCES producto(cod_producto)"
+\end{lstlisting}
+La cadena de texto posee informaci\'on relevante donde \emph{(cod\_producto)} es el campo que hace referencia como indica \texttt{REFERENCES} a la tabla \emph{producto} y al campo  \emph{(cod\_producto)}.
+Aunque el resultado es en modo texto existen formas de solucionarlo para tener la informaci\'on separada a lo que necesitamos, una manera es realizar un parseo al texto que las distintos lenguajes de programaci\'on ya tienen funciones implementadas para estas tareas. 
+\end{itemize}
+En la columna \emph{tablas} llegan a repetirse en nombre de una tablas en mas de una vez esto es debido a que nos lista por cada relaci\'on que llegue a tener una tabla con otras
+\subsection{Obteniendo las tablas independientes}
+Para obtener las tablas que son independientes de otras es necesario usar el script anterior la cual nos entrega un conjunto solo de las tablas que se relacionan de alguna manera entre ellas y tener otro conjunto de todas las tablas de la base de datos, como se tiene estos dos conjuntos de tablas hacemos una operaci\'on de resta entre los conjuntos. La lista de todas las tablas menos la lista de las tablas que se relacionan, como resultado se tiene las tablas que son independientes y que llegar\'ian a ser los primeros en ser llenados.
+\lstset{language=sql,breaklines=true}
+\label{SQL Tablas independientes}
+\captionof{lstlisting}{Query para obtener tablas independientes}
+\begin{lstlisting}
+SELECT tablename
+FROM pg_tables
+WHERE schemaname = 'public' AND
+      tablename NOT IN
+     (SELECT (SELECT relname 
+      		      FROM pg_catalog.pg_class c LEFT JOIN
+                   pg_catalog.pg_namespace n ON 
+                   n.oid = c.relnamespace 
+              WHERE
+                   c.oid=r.conrelid) as nombre
+      FROM pg_catalog.pg_constraint r 
+      WHERE r.conrelid IN
+            (SELECT c.oid
+             FROM pg_catalog.pg_class c LEFT JOIN
+                  pg_catalog.pg_namespace n ON 
+                  n.oid = c.relnamespace 
+             WHERE c.relname !~ 'pg_' AND 
+                   c.relkind = 'r' AND 
+                   pg_catalog.pg_table_is_visible(c.oid))
+      AND r.contype = 'f')
+\end{lstlisting}
+El c\'odigo SQL para obtener esa informaci\'on es la que vemos en la Figura \ref{SQL Tablas independientes}, si ejecutamos esta consulta nos dar\'ia el siguiente resultado.
+
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[width=150mm,height=30mm]{images/resTablasInd}}
+\caption{Tablas independientes} \label{fig:Tablas independientes}
+\end{figure}
+
+Si analizamos la Figura \ref{fig:Modelo ER} Modelo ER del Capitulo \ref{chap:Algoritmos de ordenamiento y mecanismos del manejo referencial} podemos observar que las entidades que son independientes que no hacen referencia a otra son las mismas que nos da como resultado en la Figura \ref{fig:Tablas independientes}.
+\section{Ordenando los metadatos}
+Si ya contamos con la informaci\'on de los metadatos de una base de datos es necesario por una parte tener claro en el detalle de una tabla, que las llaves for\'aneas pueden ser un conjunto de columnas que hagan referencia a una determinada tabla.
+
+Al momento de hacer las inserciones de datos se debe tener cuidado con este caso si insertamos valores a columnas que hacen referencia estas deben existir en la tabla referenciada veamos un ejemplo:
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[scale=0.5]{images/ModeloERcomp}}
+\caption{Modelo ER compuesto} \label{fig:ModeloERcomp}
+\end{figure}
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[width=130mm,height=40mm]{images/tablaVenta}}
+\caption{tabla venta} \label{fig:tabla venta}
+\end{figure}
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[width=130mm,height=35mm]{images/tablaDetalleCorrecto}}
+\caption{tabla detalle inserci'on Correcta} \label{fig:InsercionCorrecta}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[width=130mm,height=35mm]{images/tablaDetalleIncorrecto}}
+\caption{tabla detalle inserci'on Incorrecta} \label{fig:InsercionIncorrecta}
+\end{figure}
+Como podemos observar en la Figura \ref{fig:ModeloERcomp} la entidad venta es una composici\'on de \textit{vendedor} y \textit{cliente} y que esta a la vez llega ser maestra de la entidad \textit{detalle}, por lo tanto la entidad \textit{detalle} tiene una llave compuesta. Si el modelo lo llevamos a un sistema gestor de base de datos en este caso PostgreSQL y llenamos con uno cuantos datos de prueba como vemos en la Figura \ref{fig:tabla venta} que esta compuesta de llaves compuestas.
+
+Al realizar la inserci\'on en \textit{detalle} debemos tener cuidado en no cometer el error de la ultima inserci\'on que se quiere hacer en la Figura \ref{fig:InsercionIncorrecta}, esta llega a ser incorrecta debido a que no existe una fila de (\textit{cod\_venta,cod\_cliente,cod\_vendedor}) en la tabla \textit{venta} con valores de (\textit{2,1,1}), llegando a no cumplir la integridad referencial adem\'as son datos inconsistentes. La ultima inserci'on de la Figura \ref{fig:InsercionCorrecta} es correcta porque si vemos la tabla Figura \ref{fig:tabla venta} podemos encontrar una fila tambi\'en conocida como tupla que (\textit{cod\_venta,cod\_cliente,cod\_vendedor}) tengan los valores (\textit{2,1,2}) cumpliendo as\'i la integridad referencial y consistencia de datos.
+  
+  
+La otra parte es el ordenar la lista de tablas seg\'un la prioridad que deben ser llenados, esta claro que las tablas independientes son los primeros de ahi en adelante aun no esta claro, por lo tanto es necesario desarrollar mecanismos para obtener una lista de tablas seg\'un el orden en que se requiere.
+
+Para evitar errores de estos dos casos es necesario desarrollar mecanismos que ayuden de alguna manera a solucionar el problema, en el Capitulo \ref{chap:Algoritmos de ordenamiento y mecanismos del manejo referencial}. ya desarrollamos mecanismos de como obtener una lista ordenada haremos aplicaci\'on de dicho algoritmo y como manejar las llaves compuestas para evitar los problemas de la Figura \ref{fig:InsercionIncorrecta}, haremos uso de esas t\'ecnicas.
+\subsection{Ordenando las tablas}
+La Figura \ref{SQL Tablas independientes} nos da  como resultado las tablas que deben ser llenados primero, las siguientes son algunas de la lista que nos entrega el query de la Figura \ref{SQL Tablas que referencian}, que pr\'acticamente est\'an desordenados.
+
+Si el modelo entidad relaci\'on de la Figura \ref{fig:ModeloERcomp} lo llevamos a postgreSQL y aplicamos el query de la Figura \ref{SQL Tablas que referencian} obtenemos el siguiente resultado:\\
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[scale=0.34]{images/referenciasModeloComp}}
+\caption{Detalle de relaciones entre tablas} \label{fig:referenciasModeloComp}
+\end{figure}
+En la Figura \ref{fig:referenciasModeloComp} en la primera columna se tiene en nombre de tablas que hacen referencia a las entidades de la base de datos, pero en la tercera columna no se tiene separada en nombre de la tabla que es referenciada por que es necesario separarlos de alguna manera, analicemos el formato de texto que nos da como resultado para la primera linea perteneciente a \textit{detalle}:
+\lstset{language=sql,breaklines=true}
+\begin{lstlisting}
+"FOREIGN KEY (cod_cliente, cod_venta, cond_vendedor) REFERENCES venta(cod_cliente, cod_venta, cond_vendedor)"
+\end{lstlisting}
+Lo que haremos es separar en cinco partes la cadena de texto:
+\begin{enumerate}
+\item \texttt{FOREIGN KEY}
+\item \texttt{cod\_cliente, cod\_venta, cond\_vendedor}
+\item \texttt{REFERENCES venta}
+\item \texttt{cod\_cliente, cod\_venta, cond\_vendedor}
+\item ...
+\end{enumerate}
+Las manera de implementar puede variar de acuerdo a la tecnolog\'ia sea java, php, python etc... sin embargo muchas de estas tecnolog\'ias ya vienen implementadas estas funciones para hacer estas tareas, por ejemplo en java podemos llevar la cadena de texto a un arreglo de textos simplemente definimos delimitadores que este caso serian $`` (  ,  )  "$   obteniendo as\'i un resultado similar a la que listamos. A partir de esa lista escogemos el de la posici\'on 2 iniciando a contar desde 0 que llega ser \textit{REFERENCES venta} en este caso en particular, esta cadena lo volvemos a separar en dos:
+\begin{enumerate}
+\item \texttt{REFERENCES}
+\item \texttt{venta}
+\end{enumerate}
+Como ya tenemos el nombre de la tabla retornamos este valor como la tabla que es referenciada para \textit{detalle}. Realizamos esto para cada una de la lista de la Figura \ref{fig:referenciasModeloComp}.
+
+Cabe aclarar que en la segunda columna en la segunda separaci\'on de texto que hicimos puede que en algunos casos sobre todo cuando se hace uso de scheme(esquemas) en postgreSQL venga concatenada en nombre del scheme antes del nombre de la tabla concatenada con un punto seguido con el nombre de la tabla ej.
+
+public.venta.
+
+Lo cual no deber\'ia preocuparnos por el simple hecho de que nos ayuda a a identificar en que scheme se encuentra la tabla.Como resultado de las operaciones que se hizo se obtiene el siguiente resultado.
+\begin{center}
+\scriptsize
+  \captionof{table}{tablas que referencian a otra}
+  \renewcommand{\arrayrulewidth}{1pt}
+  \label{table3} % for use in \ref{table1} if you want to refer to the table number
+\begin{tabular}{|p{40mm}|p{98mm}|}
+\hline
+\textbf{tablas que referencian} & \textbf{tablas referenciadas} \\ \hline
+detalle                         & venta                         \\ \hline
+detalle                         & producto                      \\ \hline
+vendedor                        & turno                         \\ \hline
+venta                        & cliente                       \\ \hline
+venta                           & vendedor                      \\ \hline
+\end{tabular}
+\end{center}
+En la primera columna se tiene las tablas que hacen referencia y en la segunda columna las que son referenciados. Para hacer uso del algoritmo de ordenaci\'on \ref{Algoritmo de ordenamiento} del Capitulo \ref{Algoritmos de ordenamiento y mecanismos del manejo referencial},  ya contamos con datos hasta el paso dos por lo tanto pasamos al paso tres donde realizamos la b'usqueda para todas aquellas entidades que le hacen referencia a los que son independientes, que para el modelo ER de la Figura \ref{fig:ModeloERcomp} llegar\'ia a ser lo siguiente:
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.2]{images/desordenadocomp.png}
+\caption{secuencia}
+\end{figure}
+Donde podemos observar que en nombre de las tablas se llegan a repetir en varios lugares aplicamos el \ref{Algoritmo de ordenacion primeros en ser llenado} de Capitulo \ref{Algoritmos de ordenamiento y mecanismos del manejo referencial} , como resultado llegamos a tener el siguiente orden:
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.2]{images/ordenadocomp.png}
+ \caption{Orden correcto}
+ \end{figure}
+  
+\subsection{Uniendo \texttt{foreign keys}}
+Una vez que ya tenemos la informaci\'on detallada por cada una de las tablas que hacen referencia y de las cuales las columnas que est\'en involucradas llegan a ser llaves extranjeras, que si bien pueden ser parte de la llave primaria compuesta de la tabla o simplemente ser una llave for\'anea, al momento de insertar puede llegar a dar lo mismo, por lo tanto no vamos a centrarnos en ese detalle.
+
+La informaci\'on que nos provee el query de la Figura \ref{SQL detalle tabla metodo2} nos da una detallada informaci\'on sobre una tabla en particular pero para lo que necesitamos generar datos de prueba es importante tener mecanismos que eviten cometer errores en las llaves que no son propias de una tabla.Para lo cual haremos uso de \ref{Algoritmo de union de referencias}. En el query de la Figura \ref{fig:referenciasModeloComp} tenemos una informaci\'on valiosa en la tercera columna:
+
+\lstset{language=sql,breaklines=true}
+\begin{lstlisting}
+"detalle";"venta_detalle_fk";"FOREIGN KEY (cod_cliente, cod_venta, cond_vendedor) REFERENCES venta(cod_cliente, cod_venta, cond_vendedor)"
+"detalle";"producto_detalle_fk";"FOREIGN KEY (cod_producto) REFERENCES producto(cod_producto)"
+\end{lstlisting}
+La tabla \textit{detalle} con las columnas \textit{(cod\_cliente, cod\_venta, cond\_vendedor)} hace referencia a la tabla \textit{venta} a las columnas \textit{(cod\_cliente, cod\_venta, cond\_vendedor)}, adem\'as la columna \textit{(cod\_producto)} hace referencia a la tabla \textit{producto} a la columna \textit{(cod\_producto)}, son las llaves que no son propias de la tabla \textit{detalle}, veamos y analicemos la informaci\'on detallada que nos provee el query de la Figura \ref{SQL detalle tabla metodo2} sobre esta tabla 
+ 
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[width=150mm,height=35mm]{images/detalleTablaDetalle}}
+\caption{Detalle de la tabla \textit{detalle}} \label{fig:detalleTablaDetalle}
+\end{figure}
+Fij\'emonos en el detalle que nos da como informaci\'on la Figura \ref{fig:detalleTablaDetalle},  las llaves que no son propias no est\'an agrupadas de acuerdo a la tabla que referenci\'an como sucede en la Figura \ref{fig:referenciasModeloComp} donde si lo agrupa pero solo nos provee esos campos que son llaves que apuntan a otra tabla, a diferencia de la Figura \ref{fig:detalleTablaDetalle} si nos da la informaci\'on de todas las columnas.
+
+El formato detallado de la tabla que necesitamos es unir esas dos informaciones que tenemos obtener algo similar al siguiente cuadro.
+
+\begin{center}
+\scriptsize
+  \captionof{table}{tabla de referencias para la tabla detalle}
+\renewcommand{\arrayrulewidth}{1pt}  
+  \label{tableReferenciasTablaDetalle1} % for use in \ref{table1} if you want to refer to the table number
+  \begin{tabular}{|l|p{10mm}|p{45mm}|l|l|l|}
+\hline
+\textbf{\begin{tabular}[c]{@{}l@{}}nombre\\ columna\end{tabular}}                   & \textbf{\begin{tabular}[c]{@{}l@{}}tipo\\ de\\ dato\end{tabular}} & \textbf{es primaria?} & \textbf{serial} & \textbf{\begin{tabular}[c]{@{}l@{}}tabla a\\ la que\\ referencia\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}columnas a la\\ que referencia\end{tabular}}     \\ \hline
+cod\_detalle                                                                        & \texttt{INTEGER}                                                         & \texttt{PRIMARY KEY}  & si              & \texttt{NULL}                                                                         & null                                                                                \\ \hline
+cod\_producto                                                                       &                                                                 & FORANEA               &                 & producto                                                                     & cod\_producto                                                                       \\ \hline
+\begin{tabular}[c]{@{}l@{}}cod\_venta,\\ cod\_cliente,\\ cod\_vendedor\end{tabular} &                                                                 & FORANEA               &                 & venta                                                                        & \begin{tabular}[c]{@{}l@{}}cod\_venta,\\ cod\_cliente,\\ cod\_vendedor\end{tabular} \\ \hline
+\end{tabular}
+\end{center}
+Si recordamos el query de la figura \ref{SQL Tablas que referencian} da como resultado la lista de tablas que referenci'an en este caso no necesitamos la informaci'on de todos, requerimos espec'ificamente para una tabla determinada. Para lo cual haremos alguna modificaci\'on al query de la Figura \ref{SQL Tablas que referencian} quedando de la siguiente forma:
+
+\lstset{language=sql,breaklines=true}
+\label{muestra detalle tabla por tabla}
+\captionof{lstlisting}{Query para detalle referencias para una tabla}
+\begin{lstlisting}
+SELECT(SELECT relname
+       FROM pg_catalog.pg_class c 
+            LEFT JOIN 
+                 pg_catalog.pg_namespace n ON 
+                 n.oid=c.relnamespace
+       WHERE
+            c.oid=r.conrelid) as nombre,
+       conname,
+       pg_catalog.pg_get_constraintdef(oid,true)AS ref 
+FROM
+        pg_catalog.pg_constraint r 
+WHERE r.conrelid IN
+        (SELECT 
+                c.oid 
+         FROM pg_catalog.pg_class c 
+             LEFT JOIN
+                pg_catalog.pg_namespace n ON 
+                n.oid = c.relnamespace 
+         WHERE 
+               c.relname !~ 'pg_' AND 
+               c.relkind='r' AND 
+               pg_catalog.pg_table_is_visible(c.oid))AND
+      r.contype = 'f' AND 
+        (SELECT relname 
+         FROM pg_catalog.pg_class c 
+             LEFT JOIN
+              pg_catalog.pg_namespace n ON
+              n.oid = c.relnamespace 
+         WHERE
+              c.oid=r.conrelid)='nombreTabla';";
+\end{lstlisting}
+A diferencia del query de la figura \ref{SQL Tablas que referencian} en este query especificamos exactamente para que tabla queremos saber a quienes referencia agregando al final las siguientes lineas de c\'odigo sql:
+
+\lstset{language=sql,breaklines=true}
+\label{muestra detalle tabla por tabla plus}
+\captionof{lstlisting}{Parte que determina para una tabla}
+\begin{lstlisting}
+           AND 
+            (SELECT relname 
+             FROM pg_catalog.pg_class c 
+                  LEFT JOIN
+                  pg_catalog.pg_namespace n ON
+                  n.oid = c.relnamespace 
+             WHERE
+                   c.oid=r.conrelid)='nombreTabla';";
+\end{lstlisting}
+Con la adici'on del c'odigo extra hacemos que no filtre solo para la tabla que requerimos bastara con solo cambiar el \textit{nombreTabla}.
+El resultado de este query nos dar\'ia solo los registros donde una determinada tabla hace referencia, veamos para el caso de la tabla \textit{detalle} :
+
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[width=150mm,height=40mm]{images/referenciasTablaDetalle}}
+\caption{Detalle de referencias de la tabla detalle} \label{fig:referenciasTablaDetalle}
+\end{figure}
+
+Los resultados no llegan a ser tan buenos debido a que nos devuelve en texto todo los datos de las columnas que referenci'an y la tabla que es referenciada con sus respectivos columnas. Haremos uso de las mismas t'ecnicas que aplicamos al momento de realizar el ordenamiento de las tablas seg'un el orden que deben ser llenados que al final necesitamos tener un resultado similar a la siguiente tabla.
+
+\begin{center}
+\scriptsize
+  \captionof{table}{tabla referencias formateada}
+  \label{tablaReferenciasFormateada1} % for use in \ref{table1} if you want to refer to the table number
+  \begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{\begin{tabular}[c]{@{}l@{}}tabla que \\ referencia\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}columnas que \\ referencian\end{tabular}}           & \textbf{\begin{tabular}[c]{@{}l@{}}tabla \\ referenciada\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}columnas \\ referenciadas\end{tabular}} \\ \hline
+detalle                                                                  & cod\_producto                                                                          & producto                                                               & cod\_producto                                                              \\ \hline
+detalle                                                                  & \begin{tabular}[c]{@{}l@{}}cod\_cliente, \\ cod\_venta,\\  cond\_vendedor\end{tabular} & venta                                                                  & cod\_cliente, cod\_venta, cond\_vendedor                                   \\ \hline
+\end{tabular}
+\end{center}
+
+De la Figura \ref{fig:referenciasTablaDetalle} tomamos la columna 3 y la fila 2 como ejemplo escogemos la fila 2 por razones did'acticas, es donde se encuentra la informaci\'on a en modo texto:
+\lstset{language=sql,breaklines=true}
+\begin{lstlisting}
+"FOREIGN KEY (cod_cliente, cod_venta, cond_vendedor) REFERENCES venta(cod_cliente, cod_venta, cond_vendedor)"
+\end{lstlisting}
+ La cadena de texto lo separamos en 5 partes:
+ 
+ \textit{Lista en 5 partes}
+ \begin{enumerate}
+ \item \texttt{FOREIGN KEY}
+ \item \texttt{cod\_cliente, cod\_venta, cond\_vendedor}
+ \item \texttt{REFERENCES venta}
+ \item x\texttt{REFERENCES venta}
+ \item ...
+ \end{enumerate}
+ 
+ Para obtener esta lista separada llevamos a un arreglo la cadena de texto teniendo como separadores a
+ $ ``(" , ``)" $ . La mayor'ia de los lenguajes de programaci\'on ya nos proveen funciones que realicen esta tarea de llevar una cadena de texto a un arreglo con solo indicando los caracteres separadores.
+ 
+ En las la mayor'ia de los lenguajes de programaci'on el conteo de las posiciones se inicia en 0 por tanto vamos basarnos en esa regla, del arreglo solo necesitamos el de la posici'on 1 es donde se encuentra las columnas que hacen referencia en conjunto a la tabla de la posici'on 2 de arreglo sin antes aclarar que este elemento de la posici'on debe ser separado en dos partes:
+ 
+\textit{Lista en 2 partes} 
+ \begin{enumerate}
+ \item \texttt{REFERENCES}
+ \item venta.
+\end{enumerate}  
+
+De esta lista solo nos es 'util el de la posici'on 1 es donde encontramos en nombre de la tabla al que se hace referencia.
+
+Si volvemos a la lista que separamos en 5 partes el otro elemento 'util es de la posici'on 3, es donde encontramos las columnas referenciadas.
+
+Realizamos este procedimiento por cada relaci'on que haga la tabla obteniendo as'i un resultado similar a la tabla del cuadro \ref{tablaReferenciasFormateada1}.
+Con los resultados obtenidos de la Figura \ref{fig:detalleTablaDetalle} y el de la Figura tabla formateada del cuadro \ref{tablaReferenciasFormateada1} realizamos la union de estos dos resultados para tener una tabla como se ve en el cuadro \ref{tableReferenciasTablaDetalle1}.
+
+Para obtener un resultado del cuadro \ref{tableReferenciasTablaDetalle1} es necesario agregar campos al resultado que nos provee la Figura \ref{fig:detalleTablaDetalle}, agregamos cuatro campos adicionales:
+\begin{itemize}
+	\item \textit{es\_foranea} En esta columna podemos agregar si es for'anea o no para luego ser evaluado como tal.
+	\item \textit{referencian} En esta columna agregamos los nombres de las columnas que hacen referencia a otra tabla.
+	\item \textit{tabla} En esta columna agregamos el nombre de la tabla al que referencia.
+	\item \textit{referenciados} En esta columna agregamos los nombres de las columnas que son referenciados.
+\end{itemize}
+Quedando una tabla de la siguiente manera
+
+\begin{center}
+\scriptsize
+  \captionof{table}{tabla con columnas aumentadas para la tabla \textit{detalle}}
+  \label{tablaDetalleAumentadaColumnas1} % for use in \ref{table1} if you want to refer to the table number
+  \begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+column\_name  & data\_type                                                  & constraint\_type & .......... & es\_foranea & \begin{tabular}[c]{@{}l@{}}columnas\\ referencian\end{tabular} & \begin{tabular}[c]{@{}l@{}}tabla\\ referenciada\end{tabular} & \begin{tabular}[c]{@{}l@{}}columnas\\ referenciadas\end{tabular} \\ \hline
+cod\_detalle  & \begin{tabular}[c]{@{}l@{}}character\\ varying\end{tabular} & PRIMARY\_KEY     & .........  &             &                                                                &                                                              &                                                                  \\ \hline
+cod\_venta    & \texttt{INTEGER}                                                    & \texttt{PRIMARY\_KEY}     &            &             &                                                                &                                                              &                                                                  \\ \hline
+cod\_cliente  & \texttt{INTEGER}                                                     & \texttt{PRIMARY\_KEY}    &            &             &                                                                &                                                              &                                                                  \\ \hline
+cod\_vendedor & \texttt{INTEGER}                                                     & \texttt{PRIMARY\_KEY}     &            &             &                                                                &                                                              &                                                                  \\ \hline
+cod\_producto & \texttt{INTEGER}                                                     & \texttt{PRIMARY\_KEY}     &            &             &                                                                &                                                              &                                                                  \\ \hline
+\end{tabular}
+\end{center}
+
+Si rocordamos la cadena de texto 
+\lstset{language=sql,breaklines=true}
+\begin{lstlisting}
+"FOREIGN KEY (cod_cliente, cod_venta, cond_vendedor) REFERENCES venta(cod_cliente, cod_venta, cond_vendedor)
+FOREIGN KEY (cod_producto) REFERENCES producto(cod_producto)"
+\end{lstlisting}
+que lo llevamos en un arreglo de 5 elementos, el elemento de la posici'on 1 que llega a ser
+\lstset{language=sql,breaklines=true}
+\begin{lstlisting}
+"cod_cliente, cod_venta, cond_vendedor"
+\end{lstlisting}
+Es donde encontramos las columnas que hacen referencia por lo tanto a esta cadena necesitamos tambi'en llevarlo a un arreglo lineal donde el car'acter separador llega a ser el $`` , " $  quedando como resultado.
+\begin{center}
+\scriptsize
+\renewcommand{\arrayrulewidth}{1pt}
+  \captionof{table}{columnas de la tabla detalle que referencian a venta}
+  \label{columnasQueRefencian1} % for use in \ref{table1} if you want to refer to the table number
+  \begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{nombre columna} & cod\_cliente & cod\_venta & cond\_vendedor \\ \hline
+\textbf{posicion}       & 0            & 1          & 2              \\ \hline
+\end{tabular}
+\end{center}
+
+
+\begin{center}
+\scriptsize
+\renewcommand{\arrayrulewidth}{1pt}
+  \captionof{table}{columna de la tabla detalle que referencia a producto}
+  \label{columnaQueRefencian2} % for use in \ref{table1} if you want to refer to the table number
+  \begin{tabular}{|l|l|}
+\hline
+\textbf{nombre columna} & cod\_producto \\ \hline
+\textbf{posici'on}      & 0             \\ \hline
+\end{tabular}
+\end{center}
+
+Los datos del cuadro \ref{columnasQueRefencian1} y \ref{columnaQueRefencian2} son las que hacen referencia a otra tabla para unir las llaves for'aneas y llegar a un resultado como en el cuadro \ref{tableReferenciasTablaDetalle1} para lo cual realizaremos el siguiente procedimiento.
+
+\begin{enumerate}
+\item Realizar la uni'on en un arreglo 'unico los elementos del cuadro \ref{columnasQueRefencian1} y \ref{columnaQueRefencian2} llamemosle \textit{referencian} y nos declaramos dos variables denominemosle \textit{pos} y \textit{posTabla} declarada con valor inicial de 0 para controlar la posici'on del nuevo arreglo creado.
+\item Obtener el elemento de la la posici'on \textit{pos} y comparar con el elemento de la posici'on \textit{posTabla} del cuadro de \ref{tablaDetalleAumentadaColumnas1} y comparamos si son iguales.
+\item Si llegan a ser iguales es porque este campo del cuadro \ref{tablaDetalleAumentadaColumnas1} es un campo que hace referencia a otra entidad por lo tanto agregamos el valor de \textit{true} en su columna \textit{es\_foranea} e incrementar el valor de pos en una unidad y volver al paso 2 asignar un valor de 0 a la variable \textit{posTabla}, de lo contrario pasar al siguiente paso.
+\item Es caso de que no sean iguales esta claro que este atributo no hace referencia a ninguna otra tabla y lo agregamos con un valor de \textit{false} y volvemos al paso 2 e incrementar el valor de la variable \textit{posTabla}.
+\end{enumerate}
+Llegado a un resultado como en el siguiente cuadro:
+
+ESTE CUADRO FALTA REEMPLAZAR POR UNO QUE SERIA COMO QUEDAR'IA
+ 
+\begin{center}
+  \captionof{table}{tabla de muestra de atributos for'aneas}
+  \label{columnasSeteadasEsForanea1} % for use in \ref{table1} if you want to refer to the table number
+  \begin{tabular}{|l|l|}
+  \hline 
+  \textbf{nombre columna} & cod\_producto \\ \hline
+  \textbf{posici'on}      & 0             \\ \hline
+  \end{tabular}
+\end{center}
+
+En el cuadro \ref{columnasSeteadasEsForanea1} ya se tiene claro que atributos que no son propias y que dependen de la existencia de registros en la tabla a la que referencia, as'i como esta no es como queremos el siguiente procedimiento a realizar es eliminar estos atributos y reemplazarlos por los que tenemos en el cuadro \ref{tablaReferenciasFormateada1}, para realizar este reemplazo necesitamos tener una tabla con los mismo atributos \textit{(tabla\_name , data\_type, check\_clause ... ,referencian,tabla,referenciados)}. Eliminando los atribustos que tengan el valor de \textit{true} en la columna \textit{es\_foranea} llegamos a tener como resultado como el siguiente cuadro
+
+ESTE CUADRO FALTA REEMPLAZAR POR UNO QUE SERIA COMO REALMENTE SE QUIERE
+
+\begin{center}
+  \captionof{table}{tabla sin los atributos for'aneas}
+  \label{columnasForaneasEliminadas1} % for use in \ref{table1} if you want to refer to the table number
+  \begin{tabular}{|l|l|}
+  \hline 
+  \textbf{nombre columna} & cod\_producto \\ \hline
+  \textbf{posici'on}      & 0             \\ \hline
+  \end{tabular}
+\end{center}
+Para obtener la otra tabla con solo de llaves for'aneas aumentamos los campos que llevan a ser similar a la tabla del cuadro \ref{columnasForaneasEliminadas1} realizamos las siguientes operaciones:
+ \begin{enumerate}
+ \item Crear un arreglo llamemosle \textit{clon} con las mismas dimensiones que del cuadro \ref{tablaDetalleAumentadaColumnas1} y declaramos una variable llamemosle \textit{indice} que hara el control de la pocisi\'on  
+ \item Obtenemos la fila de la posici\'on \textit{indice} del cuadro \ref{columnasSeteadasEsForanea1} y verificamos el valor de la columna \textit{es\_foranea} en caso que sea \textit{true} pasamos a 3 y si no hacemos un salto al 4.
+ \item A esta fila no lo hacemos la copia en \textit{clon} porque este atributo no es propia de la tabla e incrementamos en una unidad a \textit{'indice}.
+ \item Realizamos la copia en \textit{clon} e incrementamos en una unidad a \textit{indice}.
+ \item Si no hay mas elementos que comparar pasamos al siguiente de lo contrario volvemos a 2.
+ \item Al realizar los pasos anteriores el resultado obtenido ser\'a todas los atributos que son propias de la tabla, al lo cual debemos completar con las restantes que son dependientes de otras tablas pero en una forma diferente,para lo cual tomamos el de la posici'on 1 2 y 3 del arreglo separado en 5 partes que como resultado final se tiene en el cuadro \ref{columnasForaneasEliminadas1}.
+ \end{enumerate}

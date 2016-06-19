@@ -1,0 +1,223 @@
+\chapter{Algoritmos de generaci\'on de datos de prueba}
+En el desarrollo de un software que hace uso de una base de datos es muy importante para los desarrolladores sobre todo para los que son encargados de la base de datos, trabajar con una base de datos con datos de prueba  que se asemejen m\'as a las reales tanto en cantidad como en tipo de datos, para eso es necesario tener una cantidad grande de datos de prueba cuanto m\'as mejor, esto nos lleva a un enfoque de generar datos de prueba para base de datos.
+
+Poseer con una cantidad suficiente de datos de prueba no es tan sencillo por lo que un desarrollador normalmente acostumbra hacer la inserci\'on de forma manual lo cual toma un  tiempo excesivo. Cuando se quiere hacer la inserci\'on es necesario tener en cuenta los diferentes tipos de datos que la gran mayor\'ia de los DBMS posee.
+\begin{center}
+  \scriptsize	
+  \captionof{table}{Tipos de datos}
+  \label{tablaTipoDatos1} % for use in \ref{table1} if you want to refer to the table number
+  \renewcommand{\arrayrulewidth}{1pt}
+\begin{tabular}{|p{40mm}|p{98mm}|}\hline
+\textbf{Tipo de dato} & \textbf{Caracter\'isticas}\\\hline
+\texttt{VARCHAR}(tama\~no) & Almacena cadenas de caracteres de una longitud variable.
+La longitud m\'axima son 4000 caracteres \\\hline
+\texttt{CHAR}(tama\~no)&
+Almacena caracteres con una longitud fija. Siendo 2000 caracteres el máximo\\\hline
+\texttt{NUMBER}(precisi\'on, escala) &
+Almacena datos num\'ericos, tanto enteros como decimales, con o sin signo. Precisi\'on, indica el n\'umero m\'aximo de d\'igitos que va a tener el dato. Escala, indica el n\'umero de d\'igitos que puede haber a la derecha del punto decimal.\\\hline
+\texttt{LONG}&
+Almacena cadenas de caracteres de longitud variable. Puede almacenar hasta 2 gigas de informaci\'on\\\hline
+\texttt{LONG RAW}&
+Almacena datos binarios. Se emplea para el almacenamiento de gr\'aficos, sonidos, etc. Su tamaño m\'aximo es de 2 gigas\\\hline
+\texttt{DATE} &
+Almacena informaci\'on de fechas y horas.De forma predeterminada almacena un dato con el siguiente formato:siglo/a\~no/mes/dia/hora/minutos/segundos.Este formato se puede cambiar con otros par\'ametros.\\\hline
+\texttt{RAW}(tama\~no)&
+Almacena datos binarios. Puede almacenar como mucho 2000 bytes.\\\hline
+\texttt{ROWID}&
+Se trata de un campo que representa una cadena hexadecimal que indica la direcci\'on de una fila en su tabla\\\hline
+\texttt{NVARCHAR2}(tama\~no)&
+Es similar al varchar2 pero el tama\~no de un car\'acter depende de la elecci\'on del juego de caracteres. El tama\~no m\'aximo es 2000 bytes.\\\hline
+\texttt{NCHAR}(tama\~no)&
+Similar al \texttt{CHAR} y con las mismas caracter\'isticas que el \texttt{nvarchar2}\\\hline
+\texttt{CLOB}&
+Similar al \texttt{LONG} y se usa para objectos car\'acter\\\hline
+\texttt{BLOB} &
+Similar al \texttt{LONG RAW}. Este se usa para objetos binarios.\\\hline
+\end{tabular}
+\end{center}
+
+Los tipos de datos listadas anteriormente son gen\'ericas en gran parte de lo gestores de base de datos, esta lista no es la misma en lo  gestores de base de datos varia seg\'un el DBMS que incorporan sus tipos de datos personalizadas con caracter\'isticas propias a los tipos de datos de la lista anterior.
+\section{Algoritmos de generaci\'on de datos}
+La generaci\'on de datos de prueba para base de datos no llega a ser tan sencilla por los diferentes tipos de datos y el l'imite en el tama\~no, pero llega a ser una soluci\'on  para pruebas que se quiera realizar a una base de datos determinada. Para realizar la generaci\'on de datos  es necesario tener algoritmos generadores por cada tipo de datos que tome en cuenta las caracter\'isticas de la misma  y sean capaces de generar cantidades grandes tomando como base una peque\~na cantidad de datos o a lo mejor sin contar ninguna base.
+\section{Tipos num\'ericos}
+Los tipos num\'ericos consisten en enteros de 2, 4 u 8 bytes y flotantes de 4 u 8, y un n\'umero de presici\'on decimal a elecci\'on.
+Los n\'umeros enteros es uno de los m\'as sencillos a generar, con solo incrementar en una unidad al n\'umero  inicial que nos pasan como par\'ametro llegamos en alg\'un momento al l\'imite que tambi\'en se pasa como par\'ametro.
+\section{Tipos monetarios}
+Los tipos de datos monetarios en realidad se almacenan como un numero cualquiera y que estas tiene similitud con las decimales, el DBMS es quien se encarga de dar el formato necesario. 
+\section{Tipos de caracteres}
+\subsection{Generaci\'on de nombres}
+Para generar nombres es necesario tener una lista o tambi\'en podemos generarlos haciendo combinaciones de las vocales y las consonantes a continuaci\'on haremos una descripci\'on de c\'omo generar aplicando por cada una de ellas.
+\subsubsection{Generaci\'on de nombres a partir de vocales y consonantes}
+Un nombre esta compuesta generalmente por m\'as de tres caracteres puede que tenga menos y a lo mucho llega a tener 10 a excepci\'on de algunos. Y mucho depende del idioma o el pa\'is.
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[scale=0.4]{images/consonantesVocales}}
+\caption{consonantes y vocales} \label{fig:consonantes y vocales}
+\end{figure}
+Para generar un nombre es importante tener claro lo mencionado anteriormente, para ello aplicamos el siguiente algoritmo para generar nombres haciendo uso de las vocales y consonantes.
+\begin{enumerate}
+\item Crear una matriz e insertar las cinco vocales.
+\item Crear una matriz e insertar las consonantes podemos omitir las que no deseemos usarlas.
+\item Generar un n\'umero aleatorio entre 1 a 10 que representa la cantidad de caracteres del nombre y crear una variable al que se le asignar\'a el nombre.
+\item Declarar una variable bandera que indicar\'a el turno a quien corresponde sea una vocal o consonante.
+\item Preguntamos si la variable bandera indica constante si es verdadero pasamos al siguiente paso 6 caso contrario saltar al paso 7.
+\item Generamos un n\'umero aleatorio entre 0 a un m\'aximo de la cantidad de elementos del arreglo de consonantes menos uno, este llega a ser el \'indice del elemento a obtener de las consonantes para luego realizar la concatenaci\'on a la variable que maneja el nombre, contradecir la variable bandera.
+\item Generamos un n\'umero aleatorio entre 0 a un m\'aximo de 4 por la cantidad de vocales, esta llega a ser la posici\'on del elemento a obtener del arreglo de vocales y luego concatenamos a la variable que maneja el nombre, contradecir la variable bandera.
+\item Preguntamos si el tama\~no del nombre es igual al n\'umero generado en el paso 3, si es verdadero pasamos al paso 9 y si es falso volvemos al paso 5.
+\item Finalizamos y retornamos el nombre generado. 
+\end{enumerate}
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\REQUIRE m\'inimo , m\'aximo de caracteres.\\
+\STATE cantidad $\leftarrow$ random(minimo,maximo)
+\STATE numero $\leftarrow$ random(0,1)
+\STATE cadena $\leftarrow$ $`` "$
+\WHILE {$n < cantidad $}
+\IF{numero $==$ 0}
+\STATE cadena $\leftarrow$ cadena + obtenerVocal
+\ELSE
+\STATE cadena $\leftarrow$ cadena + ontenerConsonante
+\ENDIF
+\STATE numero $\leftarrow$ random(0,1)
+\ENDWHILE
+\RETURN cadena
+\end{algorithmic}
+\caption{Algoritmo de generaci\'on de palabras}\label{alg:algoritmoGeneracionPalabras}
+\end{algorithm}
+El Algoritmo~\ref{alg:algoritmoGeneracionPalabras} hace uso de vocales y consonantes para generar palabras.
+
+\subsubsection{Generaci\'on de nombres a partir de una lista de nombres y apellidos}
+La generaci\'on de nombre m\'as apellido requiere de una lista de nombre y otro de apellidos, para generar se aplica el siguiente algoritmo:
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{images/listNameApe1Ape2.png}
+\caption{apartir de una lista de nombres}
+\end{figure}
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\REQUIRE nombres $[$ $]$, apellidosPaternos $[$ $]$,apellidosMaternos $[$ $]$ \label{lin:NombresApellido1Apellido2}
+\STATE nombresCombinadas $[$ $]$
+\STATE ind
+\FOR{iniNomb $\leftarrow$ 0; iniNomb $<$ tamanio(nombres);iniNomb++}
+\FOR{iniApePat $\leftarrow$ 0; iniApePat$<$tamanio(apellidosPaternos);iniApePat++}
+\FOR{iniApePat $\leftarrow$ 0; iniApePat$<$tamanio(apellidosPaternos);iniApePat++}
+\STATE nombresCombinados$[$ind$]$ $\leftarrow$ nombres $[$ iniNomb $]$ + apellidosPaternos $[$ iniApePat $]$ + apellidosMaternos $[$ iniApePat $]$
+\ENDFOR
+\ENDFOR 
+\ENDFOR
+\RETURN \TRUE
+\end{algorithmic}
+\caption{Algoritmo de generacion de nombresLista}\label{alg:algoritmoRaro}
+\end{algorithm}
+\section{Tipos de datos binarios(Binary Data Types)}
+
+Los sistemas gestores de base de datos(DBMS) permiten almacenar archivos en formatos como \texttt{bytea}, \texttt{blob} entre otros, variando estos segun el DBMS utilizado. 
+
+En este proyecto se pondra a consideracion trabajar con postgresql el cual permite almacenar archivos en formato \texttt{bytea}. El tipo de dato \texttt{bytea} permite almacenar objetos de gran tama\~no, postgreSQL no conoce nada sobre el tipo de informaci\'on que se almacena \texttt{bytea}, simplemente lo considera como una secuencia de bytes.
+
+A momento de generar datos de prueba para base de datos, el tipo de dato \texttt{bytea} llega a ser un caso especial, debido a que no es posible crearlo como cualquier otro dato, como ser un numero de tel'efono que llega a ser combinaciones de n'umeros bajo ciertas condiciones o el caso de un nombre que son combinaciones de vocales y consonantes, sin embargo \texttt{bytea} es posible generar haciendo uso de archivos existentes teniendo solo la ruta del archivo es suficiente para poder insertar en la base datos.
+\section{Tipos fecha/hora}
+\subsection{Generaci\'on de fechas}
+Una fecha esta compuesta por tres partes:
+\begin{itemize}
+\item A\~no la parte del a\~no para nuestros d\'ias comprende de cuatro d\'igitos desde 1000 hasta el a\~no 9999 el rango no estrictamente establecido.
+\item
+Mes. la parte del mes se representa en n\'umero de dos d\'igitos que comprende en un rango ya establecida, con un inicio de 01 hasta 12 representando los doce meses del a\~no.
+\item
+ D\'ia. la cantidad de d\'ias en un mes es variable mucho depende a que mes nos referimos, el rango comprende desde el d\'ia uno y con un final variable desde 28 a 31 d\'ias.
+\end{itemize}
+Para generar una cantidad de fechas es necesario tener una fecha inicial y final. a partir de ello hacemos la combinaciones para obtener todas las fechas entre el rango dado por par\'ametro veamos en la figura \ref{fig:generacion de fechas}
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[scale=0.3]{images/algoritmoDates}}
+\caption{generaci'on de fechas} \label{fig:generacion de fechas}
+\end{figure}
+\subsubsection{Algoritmo de generaci\'on de fechas}
+Para realizar la aplicaci\'on del algoritmo de generaci\'on de fechas es necesario tener dos datos una fecha inicial y otra fecha limite final donde es importante que la fecha inicial debe ser una fecha anterior a la final, la cantidad de fechas a obtener depender\'ia del tama\~no de rango que existe entre la inicial y la final.
+
+Veamos el algoritmo de generaci\'on de fechas en formato dd/mm/aa, tomando en cuenta que la cantidad de d\'ias es variable por cada mes adem\'as tomando en cuenta a\~nos bisiestos.
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\REQUIRE fechaInicio fechaFinal
+\STATE fechas$[$ $]$
+\STATE contador $\leftarrow$ 0
+\IF{fechaInicio$ < $ fechaFinal}
+	\WHILE {fechaInicio $<$ fechaFinal}
+	\STATE fechas $[$ contador $]$ $\leftarrow$ fechaInicio+ 1 dia
+	\STATE contador $\leftarrow$ contador+1
+	\ENDWHILE
+\ELSE
+	\RETURN error
+\ENDIF
+\RETURN fechas
+\end{algorithmic}
+\caption{Algoritmo de generaci\'on de fechas}\label{alg:algoritmoGeneracionFechas}
+\end{algorithm}
+El algoritmo~\ref{alg:algoritmoGeneracionFechas} es necesario que la fecha inicial sea menor a la fecha final.
+
+\subsection{Generaci\'on de dato tipo Time}
+La estructura del dato tipo tiempo es muy similar a las fechas con la diferencia de que estas tienen un rango ya establecidos sin ninguna variaci\'on, esta compuesta por:
+\begin{enumerate}
+\item Hora. las hora se representa en un n\'umero de dos d\'igitos comenzando desde las 00 horas hasta las 23.
+\item Minuto. los minutos tambi\'en se representa en un n\'umero de dos d\'igitos con un inicio en 00 hasta 59 minutos.
+\item Segundo. el rango es id\'entica a los de los minutos.
+\end{enumerate}
+Para generar el tipo de dato time podemos hacer combinaciones de las tres partes que tiene este tipo de dato, realizando combinaciones podemos obtener la cantidad de datos que requerimos.
+
+Veamos la figura siguiente de como hacer las combinaciones:
+
+\begin{figure}[H]
+\centering
+\subfigure{\includegraphics[scale=0.3]{images/algoritmoTime}}
+\caption{generaci'on de Time} \label{fig:generacion de Time}
+\end{figure}
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\REQUIRE fechaHoraInicio fechaHoraFinal
+\STATE fechasHoras$[$ $]$
+\STATE contador $\leftarrow$ 0
+\IF{fechaHoraInicio$ < $ fechaHoraFinal}
+	\WHILE {fechaHoraInicio $<$ fechaHoraFinal}
+	\STATE fechasHoras $[$ contador $]$ $\leftarrow$ fechaHoraInicio+ 1 minuto
+	\STATE contador $\leftarrow$ contador+1
+	\ENDWHILE
+\ELSE
+	\RETURN error
+\ENDIF
+\RETURN fechasHoras
+\end{algorithmic}
+\caption{Algoritmo de generaci\'on de fecha hora}\label{alg:algoritmoGeneracionDateTime}
+\end{algorithm}
+El algoritmo~\ref{alg:algoritmoGeneracionDateTime} es necesario que la fecha inicial sea menor a la fecha final.\\
+\section{Tipos de direcciones de red}
+Las direcciones de red que almacena una base de datos son la IPv4, IPv6 y direcci'on mac.
+\subsection{Estructura de una direcci'on IPv4}
+Al igual que la direcci'on de una casa tiene dos partes (una calle y un c'odigo postal), una direcci'on IP tambi'en est'a formada por dos partes: el ID de host y el ID de red.
+\subsubsection{ID de red}
+La primera parte de una direcci'on IP es el ID de red, que identifica el segmento de red en el que est'a ubicado el equipo.
+\subsubsection{ID de host}
+La segunda parte de una direcci'on IP es el ID de host, que identifica un equipo, un router u otro dispositivo de un segmento.El ID de cada host debe ser exclusivo en el ID de red, al igual que la direcci'on de una casa es exclusiva dentro de la zona del c'odigo postal.
+
+La IPv4 tiene un un formato ( xxx.xxx.xxx.xxx) en que debemos basarnos para generar los limites van establecidos donde (0 $<$ xxx $255$) donde se debe tomar en cuenta que no se usa hasta 255.  
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{images/ipv4.png}
+\caption{ipv4}
+\end{figure}
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\REQUIRE inicio final
+\STATE direcciones$[$ $]$
+\STATE contador $\leftarrow$ 0
+\IF{inicio$ < $ fiinal}
+	\WHILE {inicio $<$ final}
+	\STATE direcciones $[$ contador $]$ $\leftarrow$ inicio+ 1
+	\STATE contador $\leftarrow$ contador+1
+	\ENDWHILE
+\ELSE
+	\RETURN error
+\ENDIF
+\RETURN direcciones
+\end{algorithmic}
+\caption{Algoritmo de generaci\'on de IPv4}\label{alg:algoritmoGeneracionIPv4}
+\end{algorithm}
