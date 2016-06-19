@@ -1,4 +1,3 @@
-ezthesis
+Documentacion projecto de grado 
 ========
-
-Formato de tesis para LaTeX
+Algoritmos y tecnicas de generacion de datos de prueba para base de datos basados en ER Idioms
