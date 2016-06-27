@@ -64,45 +64,62 @@ A continuacion damos clic en el nombre del proyeto lo cual no muestra toda la es
 \subfigure{\includegraphics[scale=0.3]{images/prototipo/7-viewListTablesUI.png}}
 \end{figure}
 Si observamos en la Figura \ref{fig:detalletablerol} se tiene \texttt{id\_rol, nombre}, donde \texttt{id\_rol} es la llave primaria por lo cual este tipo de datos se genera en un cierto rango de n\'umero.
-\begin{figure}[H]
-\caption{detalle tabla rol} \label{fig:detalletablerol}
-\centering
-\subfigure{\includegraphics[scale=0.3]{images/prototipo/8-expandFieldsTableSelected.png}}
-\end{figure}
 
 \begin{figure}[H]
 \caption{9}
 \centering
 \subfigure{\includegraphics[scale=0.3]{images/prototipo/9-viewTypeFieldAndListOptionFill.png}}
 \end{figure}
-
+Seg\'un el tipo de dato el formulario tiene una variaci\'on y las opciones que ofrece como queremos generarlo,
+para el caso de \texttt{id\_rol} al ser una llave primaria tenemos la opcion de generar en un cierto rango de numeros.
 \begin{figure}[H]
 \caption{10}
 \centering
 \subfigure{\includegraphics[scale=0.3]{images/prototipo/10-fillFieldsForTable.png}}
 \end{figure}
-
+Una vez llenada el formulario damos clic en guradar.
 \begin{figure}[H]
 \caption{11}
 \centering
 \subfigure{\includegraphics[scale=0.3]{images/prototipo/11-OKFillAndMessageSuccess.png}}
 \end{figure}
-
+Ahora veamos a una tabla que haga referencia \texttt{usuario\_rol} donde no es necesario llenar formularios.
 \begin{figure}[H]
 \caption{12}
 \centering
-\subfigure{\includegraphics[scale=0.3]{images/prototipo/12-fillTypeTextAndShowOptions.png}}
+\subfigure{\includegraphics[scale=0.3]{images/prototipo/17-usuario-rol.png}}
 \end{figure}
-
+Una vez que se conpleta la configuraci\'on de todas las tablas damos clic en el boton test y como podemos observar en la Figura \ref{fig:statusConnection}
 \begin{figure}[H]
-\caption{13}
+\caption{estado de configuracion}\label{fig:statusConnection}
 \centering
-\subfigure{\includegraphics[scale=0.3]{images/prototipo/13-fillModeList.png}}
+\subfigure{\includegraphics[scale=0.3]{images/prototipo/viewStatusSettings.png}}
 \end{figure}
-
-
-
-
+ Si se tiene toda la configuraci\'on ya se puede llenar la base de datos dando clic en el boton populate, esperamos que haga el llenado para posteriormente ver como se ven reflajado en la base de datos.
+ 
+ \begin{figure}[H]
+\caption{llenando la base de datos}\label{fig:populating}
+\centering
+\subfigure{\includegraphics[scale=0.3]{images/prototipo/populating.png}}
+\end{figure}
+Si vemos en la base de datos la tabla \texttt{docente} ya se tiene datos de prueba como vemos en la Figura \ref{fig:tableDocente}
+\begin{figure}[H]
+\caption{tabla docente}\label{fig:tableDocente}
+\centering
+\subfigure{\includegraphics[scale=0.3]{images/prototipo/filledTableDocente.png}}
+\end{figure}
+pasa lo mismo con la tabla \texttt{rol} podemos observar los tres datos que ingresamos.
+\begin{figure}[H]
+\caption{tabla rol}\label{fig:tableRol}
+\centering
+\subfigure{\includegraphics[scale=0.3]{images/prototipo/filledTableRol.png}}
+\end{figure}
+si se tiene la misma base de datos en distintas maquinas podemos usar el sql generado por el generador.
+\begin{figure}[H]
+\caption{sql generado}\label{fig:sqlGenerated}
+\centering
+\subfigure{\includegraphics[scale=0.35]{images/prototipo/sql.png}}
+\end{figure}
 
 
 
