@@ -2,11 +2,11 @@
 
 En este cap'itulo se har'a muestra de las t\'ecnicas necesarias para obtener la estructura de una base de datos, una base de datos existente por lo general lleva tablas que de alguna manera se relacionan entre ellas. El detallar la estructura de una base de datos comprende:
 \begin{itemize}
-\item listar todas las tablas de una base de datos.
-\item listar las tablas que hacen referencia y a que tablas.
-\item listar las llaves primarias de una tabla.
-\item listar las llaves for\'aneas de una tabla.
-\item detallar una tablas como ser el tipo de dato, tama\~no, si puede ser nulo etc... 
+\item Listar todas las tablas de una base de datos.
+\item Listar las tablas que hacen referencia y a que tablas.
+\item Listar las llaves primarias de una tabla.
+\item Listar las llaves for\'aneas de una tabla.
+\item Detallar una tablas como ser el tipo de dato, tama\~no, si puede ser nulo etc... 
 \end{itemize} 
 Es muy importante realizar lo listado anteriormente para obtener la estructura de una base de datos, y usar estos resultados para construir una interfaz gr\'afica de configuraci\'on de generaci\'on de datos de acuerdo a las caracter\'isticas de la columna de una tabla.
 Obtener de la estructura de una base de datos puede variar dependiendo del DBMS(Database Managment System) con la que trabajemos, entre los DBMS tenemos a varios entre las mas usadas est\'an MySQL, PostgreSQL, Oracle, SQLServer y otras. En este proyecto se hace la eleccion de  trabajar con postgresSQl las razones para esta elecci\'on son las siguientes.
@@ -20,7 +20,7 @@ PostgreSQL tiene una arquitectura que involucra muchos estilos, en su nivel mas 
 \begin{figure}[H]
 \centering
 \subfigure{\includegraphics[scale=0.25]{images/arquitecturaPostgres}}
-\caption{Arquitectura PostgreSQL} \label{fig:ArquitecturaPostgres}
+\caption{Arquitectura PostgreSQL \cite{postgresqlpordentro}} \label{fig:ArquitecturaPostgres}
 \end{figure}
 \begin{itemize}
 \item Libpq es el responsable de manipular las comunicaciones entre la aplicaci\'on cliente y el postmaster(Servicio del PostgreSQL en el servidor).
@@ -33,7 +33,7 @@ Esto genera un intenso trabajo de I/O, cuando leemos la data la sacamos de ``dis
 \begin{figure}[H]
 \centering
 \subfigure{\includegraphics[scale=0.4]{images/almacenamientoorganizaciondatos}}
-\caption{Almacenamiento y Organizacion de datos} \label{fig:almacenamientoorganizaciondatos}
+\caption{Almacenamiento y Organizaci\'on de datos \cite{postgresqlpordentro}} \label{fig:almacenamientoorganizaciondatos}
 \end{figure}
 PostgreSQL posee un ``Storage Manager" (MySql tiene 5 o m\'as por ejemplo), esta compuesto por varios m\'odulos que proveen administraci\'on de las transacciones y acceso a los objetos de la base de datos.
 
@@ -49,7 +49,8 @@ Cada tipo de b\'usqueda tienen un tipo de \'indice adecuado para trabajarla, b\'
 \begin{figure}[H]
 \centering
 \subfigure{\includegraphics[scale=0.25]{images/comoprocesaquery}}
-\caption{Como se procesa un query} \label{fig:comoprocesaquery2}
+\caption{Como se procesa un query \cite{postgresqlpordentro}} 
+\label{fig:comoprocesaquery2}
 \end{figure}
 
 Luego pasa por:
@@ -274,7 +275,7 @@ Como resultado tenemos la siguiente informaci\'on:
 \begin{figure}[H]
 \centering
 \subfigure{\includegraphics[width=150mm,height=30mm]{images/resDetalleMet2}}
-\caption{information schema} \label{fig:Detalle Metodo 2}
+\caption{Information schema} \label{fig:Detalle Metodo 2}
 \end{figure}
 Donde:
 \begin{itemize}
@@ -378,18 +379,18 @@ Al momento de hacer las inserciones de datos se debe tener cuidado con este caso
 \begin{figure}[H]
 \centering
 \subfigure{\includegraphics[width=130mm,height=40mm]{images/tablaVenta}}
-\caption{tabla venta} \label{fig:tabla venta}
+\caption{Tabla venta} \label{fig:tabla venta}
 \end{figure}
 \begin{figure}[H]
 \centering
 \subfigure{\includegraphics[width=130mm,height=35mm]{images/tablaDetalleCorrecto}}
-\caption{tabla detalle inserci'on Correcta} \label{fig:InsercionCorrecta}
+\caption{Tabla detalle inserci'on correcta} \label{fig:InsercionCorrecta}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \subfigure{\includegraphics[width=130mm,height=35mm]{images/tablaDetalleIncorrecto}}
-\caption{tabla detalle inserci'on Incorrecta} \label{fig:InsercionIncorrecta}
+\caption{Tabla detalle inserci'on incorrecta} \label{fig:InsercionIncorrecta}
 \end{figure}
 Como podemos observar en la Figura \ref{fig:ModeloERcomp} la entidad venta es una composici\'on de \textit{vendedor} y \textit{cliente} y que esta a la vez llega ser maestra de la entidad \textit{detalle}, por lo tanto la entidad \textit{detalle} tiene una llave compuesta. Si el modelo lo llevamos a un sistema gestor de base de datos en este caso PostgreSQL y llenamos con uno cuantos datos de prueba como vemos en la Figura \ref{fig:tabla venta} que esta compuesta de llaves compuestas.
 
@@ -452,7 +453,7 @@ En la primera columna se tiene las tablas que hacen referencia y en la segunda c
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.2]{images/desordenadocomp.png}
-\caption{secuencia}
+\caption{Secuencia}
 \end{figure}
 Donde podemos observar que en nombre de las tablas se llegan a repetir en varios lugares aplicamos el \ref{Algoritmo de ordenacion primeros en ser llenado} de Capitulo \ref{Algoritmos de ordenamiento y mecanismos del manejo referencial} , como resultado llegamos a tener el siguiente orden:
 \begin{figure}[H]

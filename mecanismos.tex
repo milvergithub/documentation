@@ -4,7 +4,7 @@
 %% Recuerda que aqu'i ya puedes escribir acentos como: 'a, 'e, 'i, etc.
 %% La letra n con tilde es: 'n.
 
-\chapter{Algoritmos de ordenamiento y mecanismos del manejo referencial}
+\chapter{Algoritmos de ordenamiento y mecanismos de manejo referencial}
 \label{Algoritmos de ordenamiento y mecanismos del manejo referencial}
 Una base de datos relacional esta fuertemente ligada al concepto Entidad Relaci\'on \cite{FBD}(E-R ``Entity Relationship"). Una entidad que representa gr\'aficamente a un concepto del mundo real o abstracta, que da lugar a una tabla en la base de datos. Una relaci\'on entre dos o m\'as entidades describe alguna interacci\'on entre las mismas, el tipo de relaci\'on  dar\'a lugar a un comportamiento entre las entidades involucradas \cite{introbasedatos}.
 
@@ -16,7 +16,7 @@ En un modelo Entidad Relaci\'on (E-R) para base de datos basados en ER Idioms\ci
 \item
 Cuando una entidad es dependiente de la existencia de otra al que detalla es de tipo \textit{detalle} de la alguna entidad maestra, donde el  detalle obedece a la maestra, a diferencia de un catalogador en un maestro no se puede determinar  los posibles datos a priori ni mucho menos estimar la cantidad aproximada de datos que pueda tener y que generalmente almacena cantidades grandes de datos.
 \item
-Hay veces que una entidad dependa de s\'i mismo de esta forma llega a referenciar as\'i mismo llegando a ser una relaci\'on recursiva a la cual llega a ser una entidad de tipo \textit{reflexivo simple}, cuando se implementa este tipo de relaci\'on es importante tener en cuenta que la relaci\'on no debe ser de obligatoriedad.
+Hay veces que una entidad referencia a otra del mismo tipo llegando a ser una relaci\'on recursiva la cual llega a ser una entidad de tipo \textit{reflexivo simple}, cuando se implementa este tipo de relaci\'on es importante tener en cuenta que la relaci\'on no debe ser de obligatoriedad.
 \item
 En ocasiones es necesario relacionar entidades del mismo tipo y guardar una historia de ellas, la forma de representar este concepto es que una entidad representa la forma que se relacionan la entidad que hace una doble referencia, lo cual lleva a ser una entidad tipo  \textit{reflexivo compuesto}.
 \item
@@ -41,7 +41,11 @@ Para obtener la lista de tablas seg\'un el orden en que debe ser llenado una bas
 \begin{figure}[H]
 \centering
 \subfigure{\includegraphics[scale=0.4]{images/modeloER}}
-\caption{Modelo ER} \label{fig:Modelo ER}
+\caption{Modelo ER} 
+\floatfoot{\texttt{PFK:} \textit{Primary Foreign Key, llave foranea que a la vez son parte de la llave primaria}\\
+\texttt{PK:} \textit{Primary Key, llave primaria}
+}
+\label{fig:Modelo ER}
 \end{figure}
 En la Figura \ref{fig:Modelo ER} Modelo ER, podemos observar las distintas entidades de las cuales es necesario identificar las entidades que no hagan referencia aplicando el paso dos del algoritmo podemos identificar una entidad catalogador \emph{categoria} y una entidad que generaliza \emph{persona}, a partir ellas buscamos los que le hacen referencia, \textit{categoria} y \textit{persona} la tomamos como ra\'iz del \'arbol a generar, las entidades que hacen referencia serian \textit{(producto, cliente, vendedor, proveedor, telefono, email)} abajo estar\'ian \textit{(detalleVenta y compra\_producto)} y aplicando el algoritmo se llegar\'ia a la siguiente Figura \ref{fig:ModeloOrdenado} que se encuentra en la p\'agina siguiente.
 \begin{figure}[H]
@@ -81,7 +85,9 @@ Cuando se tiene m\'as de un \texttt{primary key}, entre ellas las que son propia
 \begin{figure}[H]
 \centering
 \subfigure{\includegraphics[scale=0.5]{images/llavesCompuestas}}
-\caption{llaves compuestas} \label{fig:llaves compuestas}
+\floatfoot{\texttt{PFK:} \textit{Primary Foreign Key, llave foranea que a la vez son parte de la llave primaria}\\
+\texttt{PK:} \textit{Primary Key, llave primaria}}
+\caption{Llaves compuestas} \label{fig:llaves compuestas}
 \end{figure}
 Donde se puede ver que la entidad \textit{usuario\_rol} hace referencia a las entidades \textit{usuario} y \textit{rol}, las tres entidades llegar\'ian a formar una composici\'on  (\textit{usuario\_rol} compone de \textit{usuario} y \textit{rol}) donde la existencia de \textit{usuario\_rol} es dependiente de las que compone. Si este modelo lo llevamos a un gestor de base de datos un DBMS se llega a tener como en la figura \ref{SQLtablaUsuarioRolComposite}.\\
 \lstset{language=sql,breaklines=true}
@@ -108,6 +114,8 @@ Al hacer uso de llaves compuestas(\texttt{composite keys}) hace que un identific
 \centering
 \subfigure{\includegraphics[scale=0.4]{images/join}}
 \caption{Modelo E-R con llaves compuestas} \label{fig:llavesCompuestas}
+\floatfoot{\texttt{PFK:} \textit{Primary Foreign Key, llave foranea que a la vez son parte de la llave primaria}\\
+\texttt{PK:} \textit{Primary Key, llave primaria}}
 \end{figure}
 Donde en la entidad bit\'acora se tiene tres \texttt{primary key} llegando a ser una llave compuesta(\texttt{composite key}) y una de ellas es \textit{cod\_usuario} que si bien viene de \textit{session\_user} realmente su origen es en \textit{usuario}, por lo tanto podemos hacer un join entre \textit{bitacora} y \textit{usuario} evitando hacerlo con \textit{session\_user} obteniendo asi una consulta mas eficiente.
 \section{Mecanismo de referenciaci\'on}
