@@ -1,7 +1,19 @@
 \chapter{Algoritmos de generaci\'on de datos de prueba}
-En el desarrollo de un software que hace uso de una base de datos es muy importante para los desarrolladores sobre todo para los que son encargados de la base de datos, trabajar con una base de datos con datos de prueba  que se asemejen m\'as a las reales tanto en cantidad como en tipo de datos, para eso es necesario tener una cantidad grande de datos de prueba cuanto m\'as mejor, esto nos lleva a un enfoque de generar datos de prueba para base de datos.
+En el desarrollo de un software que hace uso de una base de datos es muy importante para los desarrolladores sobre todo para los que son encargados de la base de datos, trabajar con una base de datos con datos de prueba  que se asemejen m\'as a las reales tanto en cantidad como en tipo de datos, para lo cual es necesario tener una cantidad grande de datos de prueba cuanto m\'as mejor, esto nos lleva a un enfoque de generar datos de prueba para base de datos.
 
-Poseer con una cantidad suficiente de datos de prueba no es tan sencillo por lo que un desarrollador normalmente acostumbra hacer la inserci\'on de forma manual lo cual toma un  tiempo excesivo. Cuando se quiere hacer la inserci\'on es necesario tener en cuenta los diferentes tipos de datos que la gran mayor\'ia de los DBMS posee.
+
+Poseer con una cantidad suficiente de datos de prueba no es tan sencillo por lo que un desarrollador normalmente acostumbra hacer la inserci\'on de forma manual lo cual toma un  tiempo excesivo. Ademas cuando se quiere hacer la inserci\'on es necesario tener en cuenta los diferentes tipos de datos que la gran mayor\'ia de los SGBD (\texttt{Sistemas gestor de base de datos}) posee.
+ 
+Los tipos de datos que manejan los SGBD mediante SQL permiten definir el formato de la informaci\'on a usar en  columnas, variables y expresiones. Cabe aclarar que dependiendo del SGBD a usars los tipos pueden cambiar.
+
+Al igual que otros lenguajes de programaci\'on, para SQL se puede encontrar n\'umeros enteros, flotantes, cadenas, booleanos y dem\'as. entre los mas utilizados se tiene:
+
+\begin{itemize}
+\item Tipos de datos flotantes para representar numero de punto flotante (\texttt{float, real}).
+\item Tipos de datos temporales es seguro que en alg\'un momento es necesario guardar registros que contengan informaci\'on sobre fechas de cumplea\~nos, tiempo de llegada, etc.Para este caso existen tipos de datos(\texttt{date,datetime,timestamp,time}).
+\item Cadenas de caracteres, guardar nombres, apellidos, direcciones y otros tipos de datos denominativos requiere que el uso de cadenas de caracteres para lo cual se tiene tipos de datos (\texttt{char,varchar,text})
+\end{itemize}
+
 \begin{center}
   \scriptsize	
   \captionof{table}{Tipos de datos}
@@ -35,26 +47,19 @@ Similar al \texttt{LONG} y se usa para objectos car\'acter\\\hline
 Similar al \texttt{LONG RAW}. Este se usa para objetos binarios.\\\hline
 \end{tabular}
 \end{center}
-
-Los tipos de datos listadas anteriormente son gen\'ericas en gran parte de lo gestores de base de datos, esta lista no es la misma en lo  gestores de base de datos varia seg\'un el DBMS que incorporan sus tipos de datos personalizadas con caracter\'isticas propias a los tipos de datos de la lista anterior.
 \section{Algoritmos de generaci\'on de datos}
 La generaci\'on de datos de prueba para base de datos no llega a ser tan sencilla por los diferentes tipos de datos y el l'imite en el tama\~no, pero llega a ser una soluci\'on  para pruebas que se quiera realizar a una base de datos determinada. Para realizar la generaci\'on de datos  es necesario tener algoritmos generadores por cada tipo de datos que tome en cuenta las caracter\'isticas de la misma  y sean capaces de generar cantidades grandes tomando como base una peque\~na cantidad de datos o a lo mejor sin contar ninguna base.
 \section{Tipos num\'ericos}
 Los tipos num\'ericos consisten en enteros de 2, 4 u 8 bytes y flotantes de 4 u 8, y un n\'umero de presici\'on decimal a elecci\'on.
 Los n\'umeros enteros es uno de los m\'as sencillos a generar, con solo incrementar en una unidad al n\'umero  inicial que nos pasan como par\'ametro llegamos en alg\'un momento al l\'imite que tambi\'en se pasa como par\'ametro.
 \section{Tipos monetarios}
-Los tipos de datos monetarios en realidad se almacenan como un numero cualquiera y que estas tiene similitud con las decimales, el DBMS es quien se encarga de dar el formato necesario. 
+Los tipos de datos monetarios en realidad se almacenan como un numero cualquiera y que estas tiene similitud con las decimales, el SGBD es quien se encarga de dar el formato necesario. 
 \section{Tipos de caracteres}
 \subsection{Generaci\'on de nombres}
-Para generar nombres es necesario tener una lista o tambi\'en podemos generarlos haciendo combinaciones de las vocales y las consonantes a continuaci\'on haremos una descripci\'on de c\'omo generar aplicando por cada una de ellas.
+Para generar nombres es necesario tener una lista o tambi\'en podemos generarlos haciendo combinaciones de las vocales y las consonantes a continuaci\'on se har\'a una descripci\'on de c\'omo generar aplicando por cada una de ellas.
 \subsubsection{Generaci\'on de nombres a partir de vocales y consonantes}
 Un nombre esta compuesta generalmente por m\'as de tres caracteres puede que tenga menos y a lo mucho llega a tener 10 a excepci\'on de algunos. Y mucho depende del idioma o el pa\'is.
-\begin{figure}[H]
-\centering
-\subfigure{\includegraphics[scale=0.4]{images/consonantesVocales}}
-\caption{Consonantes y vocales} \label{fig:consonantes y vocales}
-\end{figure}
-Para generar un nombre es importante tener claro lo mencionado anteriormente, para ello aplicamos el siguiente algoritmo para generar nombres haciendo uso de las vocales y consonantes.
+Para generar un nombre es importante tener claro lo mencionado anteriormente, para ello aplicamos el siguiente algoritmo para generar nombres haciendo uso de las vocales y consonantes de la Figura \ref{fig:consonantes y vocales}.
 \begin{enumerate}
 \item Crear una matriz e insertar las cinco vocales.
 \item Crear una matriz e insertar las consonantes podemos omitir las que no deseemos usarlas.
@@ -68,7 +73,7 @@ Para generar un nombre es importante tener claro lo mencionado anteriormente, pa
 \end{enumerate}
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
-\REQUIRE m\'inimo , m\'aximo de caracteres.\\
+\REQUIRE m\'inimo , m\'aximo de caracteres.
 \STATE cantidad $\leftarrow$ random(minimo,maximo)
 \STATE numero $\leftarrow$ random(0,1)
 \STATE cadena $\leftarrow$ $`` "$
@@ -85,14 +90,13 @@ Para generar un nombre es importante tener claro lo mencionado anteriormente, pa
 \caption{Algoritmo de generaci\'on de palabras}\label{alg:algoritmoGeneracionPalabras}
 \end{algorithm}
 El Algoritmo~\ref{alg:algoritmoGeneracionPalabras} hace uso de vocales y consonantes para generar palabras.
-
-\subsubsection{Generaci\'on de nombres a partir de una lista de nombres y apellidos}
-La generaci\'on de nombre m\'as apellido requiere de una lista de nombre y otro de apellidos, para generar se aplica el siguiente algoritmo:
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.4]{images/listNameApe1Ape2.png}
-\caption{Apartir de una lista de nombres}
+\subfigure{\includegraphics[scale=0.4]{images/consonantesVocales}}
+\caption{Consonantes y vocales} \label{fig:consonantes y vocales}
 \end{figure}
+\subsubsection{Generaci\'on de nombres a partir de una lista de nombres y apellidos}
+La generaci\'on de nombre m\'as apellido requiere de una lista de nombres y otro de apellidos, para generar se aplica el siguiente algoritmo basado en la combinacion cartesiana como se ve en la Figura  \ref{fig:listNameLastName}
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
 \REQUIRE nombres $[$ $]$, apellidosPaternos $[$ $]$,apellidosMaternos $[$ $]$ \label{lin:NombresApellido1Apellido2}
@@ -109,11 +113,28 @@ La generaci\'on de nombre m\'as apellido requiere de una lista de nombre y otro 
 \end{algorithmic}
 \caption{Algoritmo de generacion de nombresLista}\label{alg:algoritmoRaro}
 \end{algorithm}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{images/listNameApe1Ape2.png}
+\caption{Apartir de una lista de nombres}\label{fig:listNameLastName}
+\end{figure}
+
 \section{Tipos de datos binarios(Binary Data Types)}
 
-Los sistemas gestores de base de datos(DBMS) permiten almacenar archivos en formatos como \texttt{bytea}, \texttt{blob} entre otros, variando estos segun el DBMS utilizado. 
+Los sistemas gestores de base de datos(SGBD) permiten almacenar archivos en formatos como \texttt{bytea}, \texttt{blob} entre otros, variando estos segun el SGBD utilizado. 
 
-En este proyecto se pondra a consideracion trabajar con postgresql el cual permite almacenar archivos en formato \texttt{bytea}. El tipo de dato \texttt{bytea} permite almacenar objetos de gran tama\~no, postgreSQL no conoce nada sobre el tipo de informaci\'on que se almacena \texttt{bytea}, simplemente lo considera como una secuencia de bytes.
+En este proyecto se pondra a consideracion trabajar con postgresql el cual permite almacenar archivos en formato \texttt{bytea}. El tipo de dato \texttt{bytea} permite almacenar objetos de gran tama\~no, postgreSQL no conoce nada sobre el tipo de informaci\'on que se almacena \texttt{bytea}, simplemente lo considera como cadena binaria, Una cadena binaria es una secuencia de octetos (o bytes). 
+
+Las cadenas binarias se distinguen de las cadenas de caracteres de dos maneras. En primer lugar, las cadenas binarias permiten espec\'ificamente el almacenamiento de octetos de valor cero y otros ``no imprimibles''  octetos (por lo general, octetos fuera comprendida entre 32 a 126). Las cadenas de caracteres no permite cero octetos, y tambi\'en no permite ning\'un otro valor de octeto y secuencias de valores de octeto que no son v\'alidos seg\'un la codificaci\'on  de caracteres seleccionado de la base de datos. En segundo lugar, las operaciones en cadenas binarias procesan los bytes reales, mientras que el procesamiento de cadenas de caracteres depende de la configuraci\'on regional. En resumen, las cadenas binarias son apropiadas para el almacenamiento de datos que el programador piensa como ``bytes en bruto'' , mientras que las cadenas de caracteres son apropiados para almacenar texto.
+
+El tipo \texttt{bytea} soporta dos formatos externos de entrada y salida de formato ``escape'' y ``hex''. Ambos de estos siempre son aceptados en la entrada. El formato de salida depende del par\'ametro de configuraci\'on, el valor predeterminado es hexagonal. (Tenga en cuenta que el formato hexadecimal se introdujo en PostgreSQL 9.0. Versiones anteriores y algunas herramientas no lo entienden)
+
+El SQL est\'andar define un tipo de cadena binaria diferente, llamado BLOB o de objeto binario grande . El formato de entrada es diferente de bytea , pero las funciones y operadores proporcionados son en su mayoría de la misma.
+\subsection{Bytea formato hexadecimal}
+El formato ``hex'' de datos binarios codifica como 2 d\'igitos hexadecimales por byte. Toda la cadena es precedido por la secuencia del signo barra contrario (para distinguirlo del formato de escape). En algunos contextos, puede ser necesario escapado con la duplicaci\'on de ella.
+\subsection{Bytea escapar formato}
+El formtato ``escape'' es el tradicional PostgreSQL formato para el bytea tipo. Se realiza de la forma de representar una cadena binaria como una secuencia de caracteres ASCII, mientras que la conversi\'on de los bytes que no se pueden representar como un car\'acter ASCII en una secuencia de escape
 
 A momento de generar datos de prueba para base de datos, el tipo de dato \texttt{bytea} llega a ser un caso especial, debido a que no es posible crearlo como cualquier otro dato, como ser un numero de tel'efono que llega a ser combinaciones de n'umeros bajo ciertas condiciones o el caso de un nombre que son combinaciones de vocales y consonantes, sin embargo \texttt{bytea} es posible generar haciendo uso de archivos existentes teniendo solo la ruta del archivo es suficiente para poder insertar en la base datos.
 \section{Tipos fecha/hora}
@@ -126,7 +147,7 @@ Mes. la parte del mes se representa en n\'umero de dos d\'igitos que comprende e
 \item
  D\'ia. la cantidad de d\'ias en un mes es variable mucho depende a que mes nos referimos, el rango comprende desde el d\'ia uno y con un final variable desde 28 a 31 d\'ias.
 \end{itemize}
-Para generar una cantidad de fechas es necesario tener una fecha inicial y final. a partir de ello hacemos la combinaciones para obtener todas las fechas entre el rango dado por par\'ametro veamos en la figura \ref{fig:generacion de fechas}
+Para generar una cantidad de fechas es necesario tener una fecha inicial y final. a partir de ello hacemos la combinaciones cartesianas como se ve en la Figura \ref{fig:generacion de fechas}
 \begin{figure}[H]
 \centering
 \subfigure{\includegraphics[scale=0.5]{images/algoritmoDates}}
@@ -135,7 +156,7 @@ Para generar una cantidad de fechas es necesario tener una fecha inicial y final
 \subsubsection{Algoritmo de generaci\'on de fechas}
 Para realizar la aplicaci\'on del algoritmo de generaci\'on de fechas es necesario tener dos datos una fecha inicial y otra fecha limite final donde es importante que la fecha inicial debe ser una fecha anterior a la final, la cantidad de fechas a obtener depender\'ia del tama\~no de rango que existe entre la inicial y la final.
 
-Veamos el algoritmo de generaci\'on de fechas en formato dd/mm/aa, tomando en cuenta que la cantidad de d\'ias es variable por cada mes adem\'as tomando en cuenta a\~nos bisiestos.
+A continuaci\'on se presenta el algoritmo de generaci\'on de fechas en formato dd/mm/aa, tomando en cuenta que la cantidad de d\'ias es variable por cada mes adem\'as tomando en cuenta a\~nos bisiestos.
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
 \REQUIRE fechaInicio fechaFinal
@@ -153,8 +174,6 @@ Veamos el algoritmo de generaci\'on de fechas en formato dd/mm/aa, tomando en cu
 \end{algorithmic}
 \caption{Algoritmo de generaci\'on de fechas}\label{alg:algoritmoGeneracionFechas}
 \end{algorithm}
-El algoritmo~\ref{alg:algoritmoGeneracionFechas} es necesario que la fecha inicial sea menor a la fecha final.
-
 \subsection{Generaci\'on de dato tipo Time}
 La estructura del dato tipo tiempo es muy similar a las fechas con la diferencia de que estas tienen un rango ya establecidos sin ninguna variaci\'on, esta compuesta por:
 \begin{enumerate}
@@ -162,9 +181,9 @@ La estructura del dato tipo tiempo es muy similar a las fechas con la diferencia
 \item Minuto. los minutos tambi\'en se representa en un n\'umero de dos d\'igitos con un inicio en 00 hasta 59 minutos.
 \item Segundo. el rango es id\'entica a los de los minutos.
 \end{enumerate}
-Para generar el tipo de dato time podemos hacer combinaciones de las tres partes que tiene este tipo de dato, realizando combinaciones podemos obtener la cantidad de datos que requerimos.
+Para generar el tipo de dato time se puede hacer combinaciones de las tres partes que tiene este tipo de dato, realizando combinaciones podemos obtener la cantidad de datos que requerimos.
 
-Veamos la figura siguiente de como hacer las combinaciones:
+En la Figura \ref{fig:generacion de Time} se hace la combinaci\'on en modo cartesiano para la generaci\'on para este tipo de dato:
 
 \begin{figure}[H]
 \centering
@@ -188,20 +207,31 @@ Veamos la figura siguiente de como hacer las combinaciones:
 \end{algorithmic}
 \caption{Algoritmo de generaci\'on de fecha hora}\label{alg:algoritmoGeneracionDateTime}
 \end{algorithm}
-El algoritmo~\ref{alg:algoritmoGeneracionDateTime} es necesario que la fecha inicial sea menor a la fecha final.\\
+
 \section{Tipos de direcciones de red}
 Las direcciones de red que almacena una base de datos son la IPv4, IPv6 y direcci'on mac.
+\begin{center}
+\scriptsize
+  \captionof{table}{red}
+  \renewcommand{\arrayrulewidth}{1pt}
+  \label{tableredtipos}
+\begin{tabular}{|l|l|l|}
+\hline
+nombre  & tama\~no        & descripci\'on               \\ \hline
+cidr    & 12 \'o 24 bytes & Redes IPv4 o IPv6         \\ \hline
+inet    & 12 \'o 24 bytes & Hosts y redes IPv4 o IPv6 \\ \hline
+macaddr & 6 bytes       & Direcci\'on MAC             \\ \hline
+\end{tabular}
+\end{center}
 \subsection{Estructura de una direcci'on IPv4}
 Al igual que la direcci'on de una casa tiene dos partes (una calle y un c'odigo postal), una direcci'on IP tambi'en est'a formada por dos partes: el ID de host y el ID de red.
 \subsubsection{ID de red}
-La primera parte de una direcci'on IP es el ID de red, que identifica el segmento de red en el que est'a ubicado el equipo.
+La primera parte de una direcci\'on IP es el ID de red, que identifica el segmento de red en el que est\'a ubicado el equipo.Todos los equipos del mismo segmento deben tener el mismo ID de red, al igual que las casas de una zona determinada tienen el mismo c\'odigo postal.
 \subsubsection{ID de host}
-La segunda parte de una direcci'on IP es el ID de host, que identifica un equipo, un router u otro dispositivo de un segmento.El ID de cada host debe ser exclusivo en el ID de red, al igual que la direcci'on de una casa es exclusiva dentro de la zona del c'odigo postal.
-
-La IPv4 tiene un un formato ( xxx.xxx.xxx.xxx) en que debemos basarnos para generar los limites van establecidos donde (0 $<$ xxx $255$) donde se debe tomar en cuenta que no se usa hasta 255.  
+La segunda parte de una direcci\'on IP es el ID de host, que identifica un equipo, un router u otro dispositivo de un segmento.El ID de cada host debe ser exclusivo en el ID de red, al igual que la direcci\'on de una casa es exclusiva dentro de la zona del c\'odigo postal. Es importante observar que al igual que dos zonas de c\'odigo postal distinto pueden tener direcciones iguales, dos equipos con diferentes IDs de red pueden tener el mismo ID de host.Sin embargo, la combinaci\'on del ID de red y el ID de host debe ser exclusivo para todos los equipos que se comuniquen entre s\'i. Las clases de direcciones se utilizan para asignar IDs de red aorganizaciones para que los equipos de sus redes puedan comunicarse en Internet.
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.4]{images/ipv4.png}
+\includegraphics[scale=0.5]{images/ipv4.png}
 \caption{Ipv4}
 \end{figure}
 \begin{algorithm}[H]

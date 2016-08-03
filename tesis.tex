@@ -1,4 +1,4 @@
-\documentclass[oneside,numbers,spanish]{ezthesis}
+\documentclass[twoside,openright,numbers,spanish]{ezthesis}
 %% # Opciones disponibles para el documento #
 %%
 %% Las opciones con un (*) son las opciones predeterminadas.
@@ -37,7 +37,7 @@
 %%   nocolors   - no incluir "xcolor" para producir ligas con colores
 %%   nographicx - no incluir "graphicx" para insertar gr'aficos
 %%   nonatbib   - no incluir "natbib" para administrar la bibliograf'ia
-
+\parskip=1pt
 %% Paquetes adicionales requeridos se pueden agregar tambi'en aqu'i.
 %% Por ejemplo:
 %\usepackage{subfig}
@@ -47,12 +47,12 @@
 %% Nota que los acentos se deben escribir: \'a, \'e, \'i, etc.
 %% La letra n con tilde es: \~n.
 
-\author{Milver F. Flores Acevedo}
+\author{Milver Felipe Flores Acevedo}
 \title{algoritmos y tecn\'icas de generac\'ion de datos de prueba para base de datos basados en idioms}
 
 \usepackage{graphicx} % figuras
 \usepackage{subfigure} % subfiguras
-\usepackage[capposition=top]{floatrow}
+%%\usepackage[capposition=top]{floatrow}
 
 
 \usepackage{algorithm}
@@ -104,7 +104,7 @@
     showtabs=false,                  
     tabsize=1,
 }
-
+%%\captionsetup[lstlisting]{position=bottom}
 \lstset{style=codeStyle}
 
 
@@ -119,8 +119,11 @@
 %% Quitar el comentario en la siguiente linea para austar los m'argenes del
 %% documento. Leer la documentaci'on de "geometry" para m'as informaci'on.
 
-%\geometry{top=40mm,bottom=33mm,inner=40mm,outer=25mm}
+\geometry{top=20mm,bottom=20mm,inner=30mm,outer=20mm}
+\setcounter{secnumdepth}{3} % para que ponga 1.1.1.1..
+\setcounter{tocdepth}{4} % para que añadir las secciones en el índice...
 
+\renewcommand{\lstlistingname}{Codigo SQL}
 %% El siguiente comando agrega ligas activas en el documento para las
 %% referencias cruzadas y citas bibliogr'aficas. Tiene que ser *la 'ultima*
 %% instrucci'on antes de \begin{document}.
@@ -128,10 +131,12 @@
 
 \begin{document}
 
+%%\thispagestyle{empty}
+%%\setcounter{page}{0}
 %% En esta secci'on se describe la estructura del documento de la tesis.
 %% Consulta los reglamentos de tu universidad para determinar el orden
 %% y la cantidad de secciones que debes de incluir.
-
+% display page numbers in the headings. Start with roman numerals %
 %% # Portada de la tesis #
 %% Mirar el archivo "titlepage.tex" para los detalles.
 \include{titlepage}
@@ -142,13 +147,8 @@
 %% Para m'as detalles y un ejemplo mirar el archivo "gracias.tex".
 \include{gracias}
 
-%% # 'Indices y listas de contenido #
-%% Quitar los comentarios en las lineas siguientes para obtener listas de
-%% figuras y cuadros/tablas.
-\tableofcontents
-\listoffigures
-\listoftables
-
+%%include indice
+\include{indice}
 %% # Cap'itulos #
 %% Por cada cap'itulo hay que crear un nuevo archivo e incluirlo aqu'i.
 %% Mirar el archivo "intro.tex" para un ejemplo y recomendaciones para
@@ -171,13 +171,13 @@
 \include{capituloG}
 \include{conclusion}
 
-\appendix
+
 %% Cap'itulos incluidos despues del comando \appendix aparecen como ap'endices
 %% de la tesis.
 %\include{apendiceA}
 %\include{apendiceB}
 %\include{apendiceC}
-
+\appendix
 %% Incluir la bibliograf'ia. Mirar el archivo "biblio.bib" para m'as detales
 %% y un ejemplo.
 

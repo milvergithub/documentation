@@ -40,13 +40,16 @@
 \begin{titlepage}
   \TitleBlock{\scshape\insertinstitution}
   \TitleBlock[\bigskip]{\scshape\insertfaculty}
+  \TitleBlock[\bigskip]{\scshape\insertdepartment}
   \TitleBlock{\Huge\scshape\inserttitle}
   \TitleBlock{\scshape
-    Tesis presentada por \insertauthor \\
-    para obtener el grado de \insertdegree\\
-    Tutorado por \insertsupervisor}
-  \TitleBlock{\insertsubmitdate}
-  \TitleBlock[\bigskip]{\insertdepartment}
+    Proyecto de grado  para optar al diploma academico 
+    en licenciatura de \insertdegree\\
+    realizado por :							\insertauthor \\
+    Tutorado por : \insertsupervisor}
+    \TitleBlock{\insertsubmitdate}
+  %%\TitleBlock[\bigskip]{\insertlugar}
+  \renewcommand{\footrulewidth}{0.0pt}% linea footer
 \end{titlepage}
 
 %% Nota 1:

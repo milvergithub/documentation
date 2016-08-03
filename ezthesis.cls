@@ -135,17 +135,23 @@
 
     \fancypagestyle{plain}{%
     \fancyhf{}
-    \fancyfoot[LE,RO]{\itshape\thepage}
+	%%init linea arriba    
+    \renewcommand{\headrulewidth}{0pt}
+	%% fin linea arriba    
+    \fancyfoot[C]{\thepage}
     \fancyfoot[RE,LO]{\draftmark}}
   \else
     \fancyhf{}
     \fancyhead[L]{\itshape\nouppercase\leftmark}
     \fancyhead[R]{\itshape\thepage}
     \fancyfoot[C]{\draftmark}
-
+	%%init linea arriba    
+    \renewcommand{\headrulewidth}{0pt}
+	%% fin linea arriba
+	\renewcommand{\footrulewidth}{0.4pt}% linea footer
     \fancypagestyle{plain}{%
     \fancyhf{}
-    \fancyfoot[R]{\itshape\thepage}
+    \fancyfoot[C]{\itshape\thepage}
     \fancyfoot[L]{\draftmark}}
   \fi
 
@@ -154,8 +160,8 @@
   \renewcommand{\headrulewidth}{0pt}
   \fancyfoot[C]{\draftmark}}
 
-  % setting page style should be done *after* geometry
-  \AtBeginDocument{\pagestyle{fancy}}
+  % AQUI setting page style should be done *after* geometry
+  \AtBeginDocument{\pagestyle{plain}}
 \else
   \AtBeginDocument{\pagestyle{headings}}
 \fi
