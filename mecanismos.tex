@@ -35,7 +35,7 @@ Para obtener la lista de tablas seg\'un el orden en que debe ser llenado una bas
 \item Seleccionar las entidades de tipo catalogo, simple, maestra que no dependan de otra entidad y entidades que sean de tipo \textit{reflexivo simple} pero que no hagan referencia a otra distinta de el, para luego almacenar este conjunto en la lista.
 \item De la lista de conjuntos obtener el ultimo conjunto de entidades alamcenda y por cada elemento buscar todas las entidades que le hagan referencia y que estas llegan a formar parte otro conjunto de entidades, una vez recorrida todos los elementos agregar como un nuevo conjunto en la lista creada anteriormente.
 \item Verificar que se ha recorrido todas las entidades, en caso de que se recorri\'o todo pasar al paso cinco, en caso contrario repetir el paso tres.
-\item si se llego hasta aqu\'i es porque ya tenemos la lista de conjuntos odernada segun a las dependencia es decir quien referencia a quien un elemento de un conjunto referencia a otro elemento del conjunto anterior, pero esta aun no es la lista para lo que requerimos ya que se da el caso de que el nombre de una entidad se repita en m\'as de una ocaci\'on dentro de un mismo conjunto o puede darse el caso que se repita el nombre en un conjunto anterior o posterior, por lo tanto es necesario aplicar el algoritmo de ordenaci\'on primeros en ser llenados a la matriz de conjuntos. Antes de pasar al dicho algoritmo veamos en un ejemplo en la siguiente secc\'ion.
+\item Si se llego hasta aqu\'i es porque se tiene la lista de conjuntos odernada segun a las dependencia es decir quien referencia a quien un elemento de un conjunto referencia a otro elemento del conjunto anterior, pero esta aun no es la lista para lo se requiere, ya que se da el caso de que el nombre de una entidad se repita en m\'as de una ocaci\'on dentro de un mismo conjunto o puede darse el caso que se repita el nombre en un conjunto anterior o posterior, por lo tanto es necesario aplicar el algoritmo de ordenaci\'on primeros en ser llenados a la matriz de conjuntos. Antes de pasar al dicho algoritmo vease en un ejemplo en la siguiente secc\'ion.
 \end{enumerate}
 \section{Aplicaci\'on del algoritmo}
 
@@ -56,8 +56,8 @@ Aplicando el paso dos del algoritmo se identifica una entidad catalogador \emph{
 \label{Algoritmo de ordenacion primeros en ser llenado}
 Para obtener una lista ordenada de acuerdo al orden que se debe realizar el llenado, se inicia el recorrido de las matrices que trae la matriz obtenida del algoritmo anterior, porque la lista se orden\'o seg\'un a que una entidad no dependiera de otra entidad, al recorrer se puede encontrar que una entidad se repita en distintos lugares, al  inicio de la matriz, puede tambi\'en estar listada en medio o al final incluso se puede dar el caso que en uno de las matrices se repita m\'as de una ocac\'ion. En la Figura \ref{fig:ModeloOrdenado} la entidad \textit{detalleVenta} se repite m\'as de una vez en la misma fila.
 
-Entonces cual lo tomamos como v\'alido?.
-Para lo cual el  recorrido se comienza con el \'ultimo de las matrices que tiene la matriz, una vez encontrada las dem\'as que puedan encontrarse en posteriores no llegar\'a a ser v\'alida porque si bien hizo una referencia a un principio ser\'a valida el \'ultimo. Esto se justifica porque si se encuentra al \'ultimo es porque a\'un hace referencia a alg\'un elemento de la matriz anterior al que pertenece, por lo tanto se debi\'o esperar que se llegue hasta ese punto. para el caso de la Figura \ref{fig:ModeloOrdenado} listamos el \'ultimo evitando que se repita.
+Entonces cual lo tomar como v\'alido?.
+Para lo cual el  recorrido se comienza con el \'ultimo de las matrices que tiene la matriz, una vez encontrada las dem\'as que puedan encontrarse en posteriores no llegar\'a a ser v\'alida porque si bien hizo una referencia a un principio ser\'a valida el \'ultimo. Esto se justifica porque si se encuentra al \'ultimo es porque a\'un hace referencia a alg\'un elemento de la matriz anterior al que pertenece, por lo tanto se debi\'o esperar que se llegue hasta ese punto. para el caso de la Figura \ref{fig:ModeloOrdenado} listar el \'ultimo evitando que se repita.
 Para obtener una lista ordenada seg\'un el orden en que deben ser llenados es necesario seguir la sigu\'iente secuencia de pasos:
 \begin{enumerate}
 \item Crear un matriz de tama\~no de la cantidad de entidades de la base de datos seleccionada.
@@ -119,11 +119,8 @@ Cuando se genera datos de prueba para una base de datos es importante tener en c
 
 Una t\'ecnica para evitar los problemas de inconsistencia es tener como fuente la tabla al que se referencia y los atributos  tomarlo como base para la generaci\'on de \emph{n} datos.
 \subsection{Referencia simple}
-Las referencias simples son cuando una tabla recibe solo un \texttt{primary key} o \texttt{foreign key} por parte de otra, observemos la figura \ref{SQLUsuarioRolSimple}.
-\lstset{language=sql,breaklines=true}
-\label{SQLUsuarioRolSimple}
-\captionof{lstlisting}{Referencia simple}
-\begin{lstlisting}
+Las referencias simples son cuando una tabla recibe solo un \texttt{primary key} o \texttt{foreign key} por parte de otra, en el c\'odigo \ref{lst:SQLUsuarioRolSimple} se puede observar el  \texttt{SQL} (por sus siglas en ingl\'es Structured Query Language) de la tabla \textit{usuario\_rol} de la figura \ref{fig:llaves compuestas}.  La tabla mencionada esta conformada de dos llaves que no son propias de la misma, \textit{cod\_usuario} forma parte de la tabla \textit{usuario} y \textit{cod\_rol} apunta a la tabla \textit{rol}, ambos son campos que apuntan a su respectiva tabla de manera \'unica por lo tanto se deja entender que se hace una referencia simple de llaves.
+\begin{lstlisting}[caption={Referencia simple},label={lst:SQLUsuarioRolSimple},language=sql]
 CREATE TABLE usuario_rol(
   cod_usuario_rol serial NOT NULL,
   cod_usuario INTEGER NOT NULL,
@@ -137,13 +134,9 @@ CREATE TABLE usuario_rol(
       ON UPDATE NOT ACTION ON DELETE NOT ACTION
 )
 \end{lstlisting}
-En la figura \ref{SQLUsuarioRolSimple} se puede observar el c\'odigo  \texttt{SQL} (por sus siglas en ingl\'es Structured Query Language) de la tabla \textit{usuario\_rol} de la figura \ref{fig:llaves compuestas}.  La tabla mencionada esta conformada de dos llaves que no son propias de la misma, \textit{cod\_usuario} forma parte de la tabla \textit{usuario} y \textit{cod\_rol} apunta a la tabla \textit{rol}, ambos son campos que apuntan a su respectiva tabla de manera \'unica por lo tanto se deja entender que se hace una referencia simple de llaves.
 \subsection{Referencia compuesta}
-Las referencias compuestas son cuando una tabla recibe m\'as de un \texttt{primary key} o \texttt{foreign key} por parte de otra. Es importante tomar los atributos que apuntan a otra como un conjunto de atributos para manejar como base para la generaci\'on de los datos requeridos.
-\lstset{language=sql,breaklines=true}
-\label{lst:SQLReferenciaCompuesta}
-\captionof{lstlisting}{Referencia compuesta}
-\begin{lstlisting}
+Las referencias compuestas es cuando una tabla recibe m\'as de un \texttt{primary key} o \texttt{foreign key} por parte de otra. Es importante tomar los atributos que apuntan a otra como un conjunto de atributos para manejar como base para la generaci\'on de los datos requeridos.
+\begin{lstlisting}[caption={Referencia compuesta},label={lst:SQLReferenciaCompuesta},language=sql]
 CREATE TABLE bitacora(
   cod_bitacora serial NOT NULL,
   cod_session INTEGER NOT NULL,
@@ -154,4 +147,4 @@ CREATE TABLE bitacora(
       ON UPDATE NOT ACTION ON DELETE NOT ACTION
 )
 \end{lstlisting}
-En la figura \ref{lst:SQLReferenciaCompuesta} el campo \textit{cod\_session} y \textit{cod\_usuario} de la tabla \textit{bitacora} hace referencia a \textit{session\_user} a los campos \textit{cod\_session} y \textit{cod\_usuario}, son dos campos que apuntan a la misma tabla que este caso \textit{session\_user} por lo tanto llega a ser una referencia compuesta.
+En el c\'odigo \ref{lst:SQLReferenciaCompuesta} el campo \textit{cod\_session} y \textit{cod\_usuario} de la tabla \textit{bitacora} hace referencia a \textit{session\_user} a los campos \textit{cod\_session} y \textit{cod\_usuario}, son dos campos que referencia a la misma tabla, este caso \textit{session\_user} por lo tanto llega a ser una referencia compuesta.

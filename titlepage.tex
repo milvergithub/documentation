@@ -37,20 +37,92 @@
 %%   \insertdepartment
 %%   \insertsubmitdate
 
+% caratula --------------------------------------------------------------
+\newcommand{\umsslogo}{
+      \adjustbox{valign=t}{\includegraphics[scale=0.04]{images/umss}}%
+}
+\newcommand{\fcytlogo}{%
+      \adjustbox{valign=t}{\includegraphics[scale=0.1]{images/fcyt}}%
+}
+
+% Carátula:
 \begin{titlepage}
-  \TitleBlock{\scshape\insertinstitution}
-  \TitleBlock[\bigskip]{\scshape\insertfaculty}
-  \TitleBlock[\bigskip]{\scshape\insertdepartment}
-  \TitleBlock{\Huge\scshape\inserttitle}
-  \TitleBlock{\scshape
-    Proyecto de grado  para optar al diploma academico 
-    en licenciatura de \insertdegree\\
-    realizado por :							\insertauthor \\
-    Tutorado por : \insertsupervisor}
-    \TitleBlock{\insertsubmitdate}
-  %%\TitleBlock[\bigskip]{\insertlugar}
-  \renewcommand{\footrulewidth}{0.0pt}% linea footer
+\pagenumbering{gobble}
+\vspace{-2.7cm}
+\begin{tabular}[t]{c p{10cm} c}
+    \umsslogo & 
+    \begin{center}
+    \large{\textsc{Universidad Mayor de San Sim\'on }} \\
+    \large{\textsc{Facultad de Ciencias y Tecnolog\'ia }} \\
+    \large{\textsc{Carrera de Ingenier\'ia de Sistemas}} 
+    \end{center}
+    &
+    \fcytlogo \\
+\end{tabular}
+
+\begin{tabular}{ l l l }
+\umsslogo & 
+\begin{tabular}[t]{@{}c@{}}UNIVERSIDAD MAYOR DE SAN SIMON\\ FACULTAD DE CIENCIAS Y TECNOLOGIA\\ CARRERA EN INGENIERIA DE SISTEMAS\end{tabular} & 
+\fcytlogo \\
+\end{tabular}
+
+\vfill
+
+\begin{center}
+\huge{\textsc{ALGOR'ITMOS Y T'ECNICAS DE GENERACI'ON DE DATOS DE PRUEBA PARA BASE DE DATOS BASADOS EN IDIOMS}}
+\end{center}
+\vspace{0.5cm}
+
+%\begin{flushright}
+\begin{center}
+\textsc{
+Proyecto de grado, presentado para optar\\
+al Diploma Acad'emico de Licenciatura \\
+en Ingenier\'a de Sistemas.
+}
+%\end{flushright}
+\end{center}
+
+\vfill
+\begin{tabbing}
+\hspace{2cm}\=\+
+	\textsc{Presentado por:} Milver Felipe Flores Acevedo	\\
+    \\
+	\textsc{Tutor:} Lic. Juan Marcelo Flores Acevedo	\\
+    \\
+	%\textsc{Cochabamba - Bolivia}\\
+    \\
+\end{tabbing}
+
+\begin{center}
+    \textsc{Cochabamba - Bolivia}\\
+    \textsc{Agosto - 2016}
+\end{center}   
+
+\vfill
+
+%\hrule
+%\vspace{0.2cm}
+%\noindent\small{Trabajo de Grado \hfill}
+
 \end{titlepage}
+%%\setlength{\unitlength}{1 cm} %Especificar unidad de trabajo
+%%\thispagestyle{empty}
+%%\begin{picture}(18,4)
+%%\put(0,0){\includegraphics[width=3cm,height=4cm]{uco.jpg}}
+%%\put(11.5,0){\includegraphics[width=4cm,height=4cm]{eupinf.jpg}}
+%%\end{picture}
+%%\\
+%%\\
+%%\begin{center}
+%%\textbf{{\Huge Universidad de Córdoba}\\[0.5cm]
+%%{\LARGE Escuela Politécnica Superior}}\\[1.25cm]
+%%{\Large Redes}\\[2.3cm]
+%%{\LARGE \textbf{Apuntes}}\\[3.5cm]
+%%{\large Tu nombre}\\[2cm]
+%%2º Ingeniería Informática (2º Ciclo)\\[1cm]
+%%Córdoba - \today
+%%\end{center}
 
 %% Nota 1:
 %% Se puede agregar un escudo o logotipo en un "Block" como:
