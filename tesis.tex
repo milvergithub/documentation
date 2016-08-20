@@ -1,5 +1,5 @@
 \documentclass[twoside,openright,numbers,spanish]{ezthesis}
-
+\usepackage{helvet}
 %% # Opciones disponibles para el documento #
 %%
 %% Las opciones con un (*) son las opciones predeterminadas.
@@ -43,7 +43,6 @@
 %% Por ejemplo:
 %\usepackage{subfig}
 \usepackage{multirow}
-\usepackage{helvet}
 %% # Datos del documento #
 %% Nota que los acentos se deben escribir: \'a, \'e, \'i, etc.
 %% La letra n con tilde es: \~n.
@@ -58,10 +57,9 @@
 
 \usepackage{algorithm}
 \usepackage{algorithmic}
-% define spanish language
-%\usepackage[spanish]{babel}
-%\usepackage[utf8]{inputenc}
-%\usepackage{scrbase}
+
+\include{spanishAlgorithmic}
+
 \usepackage{listings}
 %\newcaptionname{spanish}{\lstlistingname}{Listado}
  
