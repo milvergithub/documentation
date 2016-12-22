@@ -1,0 +1,35 @@
+\chapter{Poblando datos en la base de datos y probando el comportamiento}
+Una vez que se tiene configurada en forma completa un proyecto, el siguiente proceso a realizar es el poblado de datos y posteriormente realizar algunas consultas de prueba para ver el comportamiento con una poblaci'on de datos mayor.Para llevar adelante este objetivo es necesario tener la siguiente informaci'on. 
+\begin{itemize}
+\item Recuperar datos de conexi'on para la base de datos y realizamos la conexi'on.
+\item Obtenemos los datos de archivo \textit{mapeo.json} donde se encuentra en orden de las tablas.
+\item Por cada tabla creamos la estructura SQL de inserci'on \texttt{INSERT INTO tabla (col1,col2...coln)VALUES (val1,val2...valn)}.
+
+Existe casos muy importantes al crear la estructura de datos, la cantidad de columnas que tiene una tabla, el tipo de dato de cada columna, al momento de hacer la inserci'on es importante tomar en cuenta estos datos , casualmente que ciertos tipos de datos se insertan de una manera y  otras de cierta manera.   
+\end{itemize} 
+\section{Poblado de datos a la base de datos}
+Los distintos tipos de datos que nos provee los DBMS, algunos con una cantidad mayor de tipos de dato y otras con una cantidad mas reducida, es importante analizar como lo insertamos seg'un al tipo de dato, adem'as se debe tomar encuenta la cantidad de columnas que tiene una tabla.
+\subsection{Tipos de datos tratados como texto}
+Los tipos de datos tratados como cadenas de texto son:
+\begin{itemize}
+\item Las fechas y horas \texttt{(DATE,DATETIME,TIME)}.
+\item Las cadenas de texto \texttt{(VARCHAR,CHARACTER VARYIN,TEXT)}.
+\item Las direcciones de red \texttt{(MACADDRESS,INET)}.
+\end{itemize}
+Estos tipos de datos van entre comillas simples(\texttt{INTO tabla(col)VALUES(`col')}).
+\subsection{Tipos de datos tratados como n'umeros}
+Los tipos de datos son tratado como un numero entero sea decimal flotante son los tipos de dato como:
+\begin{itemize}
+\item Los tipos enteros \texttt{(INTEGER, BEGINT, SMALLINT, SERIAL, BIGSERIAL)}.
+\item Los tipos decimales \texttt{(FLOAT, DECIMAL MONEY)}.
+\end{itemize}
+Los tipos de datos num'ericos a diferencia del anterior no van entre comillas(\texttt{INTO tabla(col)VALUES(val)}).
+Existe otro tipo de dato mas que podemos incorporarlo es el tipo \texttt{BOOLEANO} si bien no es un numero esta no necesita ir dentro las comillas.
+\subsection{Tipo de dato bytea}
+El tipo de dato bytea es un tipo especial ya que nececita una conversion previa a la inserci'on, las distintas tecnologias ya se php, java , python , ruby etc... proveen metodos para realizar esta conversi'on, por lo cual no es un tema de preocupaci'on. Si recordamos al momento de generar los datos el tipo de dato bytea no lo guardamos en el archivo generado solo el nombre del archivo, con la que formamos un codigo SQL de insercion de la siguente manera (\texttt{INTO tabla(col)VALUES(conversionprevia(nombre archivo))}).
+\subsection{Cantidad de columnas por tabla}
+La cantidad de columnas de una tabla es variable, pudiendo tener una o mas columnas para formar la estructura del comando \texttt{INSERT} necesitamos obtener la informaci'on del directorio \textit{tables}. Donde cada tabla es representada por un archivo con el mismo nombre de la tabla y que adem'as esta contiene toda la informaci'on detallada de la tabla, entre ellas esta los nombre de las columnas.
+Con esta informacion formamos la parte necesaria del comando \texttt{INSERT INTO tabla(col1, col2,...coln)VALUES()}.
+En la parte de los valores obtenemos informacion del directorio \textit{dates del proyecto} y referencia \cite{emifpgsql}
+
+     

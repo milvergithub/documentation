@@ -1,11 +1,11 @@
 \chapter{Poblando datos en la base de datos y probando el comportamiento}
-Una vez que se tiene configurada en forma completa un proyecto, el siguiente proceso a realizar es el poblado de datos y posteriormente realizar algunas consultas de prueba para ver el comportamiento con una poblaci'on de datos mayor.Para llevar adelante este objetivo es necesario tener la siguiente informaci'on. 
+Una vez que se tiene configurada en forma completa un proyecto, el siguiente proceso a realizar es el poblado de datos y posteriormente realizar algunas consultas de prueba para ver el comportamiento con una poblaci'on de datos mayor. Para llevar adelante este objetivo es necesario tener la siguiente informaci'on. 
 \begin{itemize}
 \item Recuperar datos de conexi'on para la base de datos y realizar la conexi'on.
-\item Obtener los datos de archivo \textit{mapeo.json} donde se encuentra en orden de las tablas.
+\item Obtener los datos de archivo \textit{mapeo.json} donde se encuentra el orden de las tablas.
 \item Por cada tabla crear la estructura SQL de inserci'on \texttt{INSERT INTO tabla (col1,col2...coln)VALUES (val1,val2...valn)}.
 
-Existe casos muy importantes al crear la estructura de datos, la cantidad de columnas que tiene una tabla, el tipo de dato de cada columna, al momento de hacer la inserci'on es importante tomar en cuenta estos datos , casualmente que ciertos tipos de datos se insertan de una manera y  otras de cierta manera.   
+Existe casos muy importantes al crear la estructura de datos, la cantidad de columnas que tiene una tabla, el tipo de dato de cada columna, al momento de hacer la inserci'on es importante tomar en cuenta estos casos , la insercion varia dependiendo el tipo de dato.   
 \end{itemize} 
 \section{Poblado de datos a la base de datos}
 Los distintos tipos de datos que provee los DBMS, algunos con una cantidad mayor de tipos de dato y otras con una cantidad mas reducida, es importante analizar como se hara la inserci'on seg'un al tipo de dato, adem'as se debe tomar encuenta la cantidad de columnas que tiene una tabla.
