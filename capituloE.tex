@@ -75,7 +75,7 @@ Una alternativa para dar soluci\'on a este requisito es almacenar toda esta info
 \item Si se compara el tama\~no de un archivo JSON con uno XML y que contenga la misma informaci\'on el primero llega a ser mucho mas peque\~no.
 \end{itemize} 
 \subsection{Creando la estructura de un proyecto}
-Cuando sea crea un proyecto java ,php , python u otro, normalmente se tiene un estructura de directorios y archivos, donde ciertos archivos guardan configuraciones sobre recursos que se hacen uso, la version del proyecto entre otros. Para este proyecto se realiza algo similar para lo cual se va tener como base la estructura de la Figura \ref{estructuradirectoriosfiles} de directorios y archivos.
+Cuando sea crea un proyecto java, php, python u otro, normalmente se tiene un estructura de directorios y archivos, donde ciertos archivos guardan configuraciones sobre recursos que se hacen uso, la version del proyecto entre otros. Para este proyecto se realiza algo similar para lo cual se va tener como base la estructura de la Figura \ref{estructuradirectoriosfiles} de directorios y archivos.
 
 \begin{figure}[H]
 \centering
@@ -87,9 +87,10 @@ Cuando sea crea un proyecto java ,php , python u otro, normalmente se tiene un e
 Donde se guarda la informaci'on de los archivos de configuraci'on, veamos en detalle cada directorio y su contenido:
 \begin{itemize}
 \item \textbf{conexi\'on} En este directorio se tiene un archivo \textit{conexion.xml} la cual contiene la informaci'on de los datos de conexi'on. Va separada en un directorio por razones de que puede existir un nombre de una tabla igual al archivo por lo que es necesario que no se confunda.
-\item \textbf{control} Si se observa el contenido de los directorios \textit{control,dates,tables} son similares la diferencia esta en el contenido de los archivos.
+\item \textbf{control} Si se observa el contenido de los directorios \textit{control, dates, tables} son similares la diferencia esta en el contenido de los archivos.
  
 En este directorio se almacena archivos de control de las columnas por cada tabla y que tienen el mismo nombre que en la base de datos ver el contenido para la tabla \textit{compra\_producto} de la Figura \ref{fig:Modelo ER} se obtiene informacion como se ve en el c'odigo \ref{jsoncompraproducto}.
+
 \begin{lstlisting}[caption={Ejemplo archivo control},label={jsoncompraproducto},language=sql]
 [
   {
@@ -117,7 +118,7 @@ En este directorio se almacena archivos de control de las columnas por cada tabl
  
 Se encuentra informaci\'on en formato JSON clave - valor y donde \textit{column\_name} indica el nombre de la columna, \textit{is\_nullable} indica si este campo puede ser nulo y por ultimo \textit{rellenado} llega a ser la mas importante porque es aqu'i donde controlar si ya fue configurada esta columna.
 \item \textbf{dates} los archivos de este directorio almacenan informaci'on generada por cada columna, a excepci'on de tipos de datos como bytea o blob, para este tipo de datos es recomendable almacenar el nombre del archivo. El formato del archivo que almacena la informaci\'on generada es el codigo \ref{jsoncategoria}:
-\begin{lstlisting}[caption={Ejemplo archivo control},label={jsoncategoria},language=sql]
+\begin{lstlisting}[caption={Ejemplo archivo dates},label={jsoncategoria},language=sql]
 [
   {
     "nombre_categoria": "bebida",
@@ -143,8 +144,8 @@ Se encuentra informaci\'on en formato JSON clave - valor y donde \textit{column\
 \end{lstlisting}
 Si se observa la Figura \ref{fig:Modelo ER} la tabla \textit{categoria} tiene dos atributos \textit{nombre\_categoria} y \textit{cod\_categoria}, al ver el contenido del archivo \textit{categoria.json} de directorio \textit{dates} existen varios registros con los valores asignados, la cantidad puede variar dependiendo de la cantidad de datos que se quiere generar.
  \item \textbf{files} En este directorio se almacenan los archivos de tipo bytea y que al momento de hacer la insercion usar por su nombre.
- \item \textbf{mapeo} Solo existe un archivo con un contenido de la lista de las tablas seg'un el orden en que estas deben ser configurados adem'as tiene dos atributos mas \textit{nivel} la cual indica cual es el orden en que le corresponde y por ultimo la \textit{cantidad} si se encuentra un valor igual a cero es porque esta tabla no tiene columna alguna configurada esto deja entender que si se da un valor, es para la tabla en general. Ver para la el caso de la Figura \ref{fig:Modelo ER} se tiene la estructura de control como se ve en el codigo \ref{jsonmodelo}.
-\begin{lstlisting}[caption={Ejemplo archivo control},label={jsonmodelo},language=sql]
+ \item \textbf{mapeo} Solo existe un archivo con un contenido de la lista de las tablas seg'un el orden en que estas deben ser configurados adem'as tiene dos atributos mas \textit{nivel} la cual indica cual es el orden en que le corresponde y por ultimo la \textit{cantidad} si se encuentra un valor igual a cero es porque esta tabla no tiene columna alguna configurada esto deja entender que si se da un valor, es para la tabla en general. Ver para el caso de la Figura \ref{fig:Modelo ER} se tiene la estructura de control como se ve en el codigo \ref{jsonmodelo}.
+\begin{lstlisting}[caption={Ejemplo archivo mapeo},label={jsonmodelo},language=sql]
 [
   {
     "tablename": "categoria",
@@ -176,9 +177,9 @@ Si se observa la Figura \ref{fig:Modelo ER} la tabla \textit{categoria} tiene do
   }
 ]
 \end{lstlisting}  
-\item \textbf{tables} En el directorio tables es donde se almacen'o la informaci'on detallada por cada una de las tablas, adem'as cada archivo representa a una tabla de la base de datos y que llevan el mismo nombre. Se puede ver el contenido del archivo \textit{categoria.json} en el c'odigo \ref{jsontables} que representa a la tabla \textit{categoria}:
+\item \textbf{tables} En el directorio tables es donde se almaceno la informaci'on detallada por cada una de las tablas, adem'as cada archivo representa a una tabla de la base de datos y que llevan el mismo nombre. Se puede ver el contenido del archivo \textit{categoria.json} en el c'odigo \ref{jsontables} que representa a la tabla \textit{categoria}:
 
-\begin{lstlisting}[caption={Ejemplo archivo control},label={jsontables},language=sql]
+\begin{lstlisting}[caption={Ejemplo archivo tables},label={jsontables},language=sql]
 [
   {
     "column_name": "cod_categoria",
@@ -230,28 +231,28 @@ Las llaves for'aneas o primarias que no son propias de la tabla no se necesitan 
 \includegraphics[scale=0.4]{images/foraneasline.png}
 \caption{Foraneas line}\label{fig:ejemploForaneasLine}
 \end{figure}
-Donde la \textit{tabla1} cuenta con una llave primaria (\textit{T1C1})  al igual que la \textit{tabla2}, y si se baja un nivel mas abajo a la \textit{tabla3} esta hace referencia a \textit{tabla1} y \textit{tabla2} y que las columnas de las tablas referenciadas mandan como llaves primarias, formando asi una llave compuesta para \textit{tabla3}.Por otro lado la \textit{tabla4} hace referencia a \textit{tabla2} y que tambie tiene una llave compuesta. Si se baja a la \textit{tabla5} esta compuesta de 4 columnas de las cuales 3 no son propias, si se observa vienen juntadas como si fuera una columna es lo que se hizo al momento de guardar el detalle de una tabla, En la \textit{tabla7} se hace referencia a la \textit{tabla5} y \textit{tabla6} y las columnas que no son propias son agrupadas de acuerdo a que tabla se haga referencia es el caso de \textit{T7C2,T7C3,T7C4,T7C5} que en conjunto hacen referencia a la \textit{tabla5} y \textit{T7C6,T7C7,T7C8} hacen referencia a \textit{tabla6}.
+Donde la \textit{tabla1} cuenta con una llave primaria (\textit{T1C1})  al igual que la \textit{tabla2}, y si se baja un nivel mas abajo a la \textit{tabla3} esta hace referencia a \textit{tabla1} y \textit{tabla2} y que las columnas de las tablas referenciadas mandan como llaves primarias, formando asi una llave compuesta para \textit{tabla3}. Por otro lado la \textit{tabla4} hace referencia a \textit{tabla2} y que tambien tiene una llave compuesta. Si se baja a la \textit{tabla5} esta compuesta de 4 columnas de las cuales 3 no son propias, si se observa vienen juntadas como si fuera una columna es lo que se hizo al momento de guardar el detalle de una tabla, En la \textit{tabla7} se hace referencia a la \textit{tabla5} y \textit{tabla6} y las columnas que no son propias son agrupadas de acuerdo a que tabla se haga referencia es el caso de \textit{T7C2, T7C3, T7C4, T7C5} que en conjunto hacen referencia a la \textit{tabla5} y \textit{T7C6, T7C7, T7C8} hacen referencia a \textit{tabla6}.
 
-Al momento de hacer la configuraci\'on se llega a tener un problema, de la \textit{tabla5} el campo  \textit{T5C2,T5C3,T5C4} no es encontrada si se lo busca como una columna en la \textit{tabla3} como es posible si se tiene esas columnas? Es cierto que existen pero est'an separadas como se observa en la Figura \ref{fig:problemaColumnasForaneasLine}.
+Al momento de hacer la configuraci\'on se llega a tener un problema, de la \textit{tabla5} el campo  \textit{T5C2, T5C3, T5C4} no es encontrada si se lo busca como una columna en la \textit{tabla3} como es posible si se tiene esas columnas? Es cierto que existen pero est'an separadas como se observa en la Figura \ref{fig:problemaColumnasForaneasLine}.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.4]{images/problemaColumnas.png}
 \caption{Problema llaves foraneas}\label{fig:problemaColumnasForaneasLine}
 \end{figure}
-Se da el mismo problema para la \textit{tabla7} la columna \textit{T7C2,T7C3,T7C4,T7C5} no se encuentra en una solo columna en la \textit{tabla5} pero hay algo interesante que se puede deducir como se observa en la Figura \ref{fig:problemaColumnasForaneasGrafica}.
+Se da el mismo problema para la \textit{tabla7} la columna \textit{T7C2, T7C3, T7C4, T7C5} no se encuentra en una solo columna en la \textit{tabla5} pero hay algo interesante que se puede deducir como se observa en la Figura \ref{fig:problemaColumnasForaneasGrafica}.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.3]{images/problemaForaneas.png}
 \caption{Ejemplo foraneas unidas}\label{fig:problemaColumnasForaneasGrafica}
 \end{figure}
-En la \textit{tabla5} las columnas \textit{T5C2,T5C3,T5C4} en conjunto hacen referencia como una sola a la \textit{tabla3} donde \textit{T5C2} apunta a \textit{T3C1} y que esta es una llave primaria propia de la \textit{tabla3}, en la \textit{tabla7} la columna  \textit{T7C2} hace referencia a una propia de la \textit{tabla5}, se puede determinar que el comportamiento de las llaves primarias que no son propias siguen este modelo.
+En la \textit{tabla5} las columnas \textit{T5C2, T5C3, T5C4} en conjunto hacen referencia como una sola a la \textit{tabla3} donde \textit{T5C2} apunta a \textit{T3C1} y que esta es una llave primaria propia de la \textit{tabla3}, en la \textit{tabla7} la columna  \textit{T7C2} hace referencia a una propia de la \textit{tabla5}, se puede determinar que el comportamiento de las llaves primarias que no son propias siguen este modelo.
 \subsubsection{Problemas}
-El problema surge al momento de realizar la validaci\'on que por ejemplo cuando por alguna raz\'on se trata de configurar un atributo que hace referencia y que previamente no se configur\'on los atributos referenciados en la tabla referenciada no se llega a encontrar como se ve en la figura \ref{fig:problemaColumnasForaneasGrafica}. Las columnas de la \textit{tabla3} se van encontrar todas al igual que en la \textit{tabla4}, pero en la \textit{tabla5} no se llega a encontrar la columna \textit{T5C2T5C3T5C4} lo mismo sucede con \textit{T6C2T6C3}.
+El problema surge al momento de realizar la validaci\'on que por ejemplo cuando por alguna raz\'on se trata de configurar un atributo que hace referencia y que previamente no se configuraci\'on los atributos referenciados en la tabla referenciada no se llega a encontrar como se ve en la figura \ref{fig:problemaColumnasForaneasGrafica}. Las columnas de la \textit{tabla3} se va encontrar todas al igual que en la \textit{tabla4}, pero en la \textit{tabla5} no se llega a encontrar la columna \textit{T5C2T5C3T5C4} lo mismo sucede con \textit{T6C2T6C3}.
 Una vez hecha la validaci\'on el siguiente paso es configurar, para lo cual se necesita los datos de la tabla referenciada, al fijarse en la Figura \ref{fig:problemaColumnasForaneasGrafica} se encuentra en el mismo problema de la validaci\'on de columnas no encontradas.   
-\subsubsection{Soluci\'ones}
+\subsubsection{Soluciones}
 Una soluci\'on obvia al problema de la validaci\'on presentado es verificar que todas las columnas de la tabla referenciada se encuentren configuradas para no tener problemas al obtener los datos pero no es tan cierto se puede configurar con solo tener configuradas las columnas referenciadas se puede optar por cualquiera son cuestiones de validaci\'on.
 
-En cuanto al problema de la configuraci\'on una vez pasada la anterior la soluci\'on no llega a ser tan sencilla se necesita aplicar algun mecanismo(os) de obtener los datos, La soluci\'on que se da no estrictamente as'i depende del modelo y del manejo de iniciar con la Figura \ref{intento1}.
+En cuanto al problema de la configuraci\'on una vez pasada la anterior la soluci\'on no llega a ser tan sencilla se necesita aplicar algun mecanismo(os) de obtener los datos. La soluci\'on que se da no estrictamente depende del modelo y del manejo de iniciar con la Figura \ref{intento1}.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{images/paso1.png}
@@ -263,7 +264,7 @@ En el primer intento no se llega a la soluci\'on ya que no se encuentra la colum
 \includegraphics[scale=0.35]{images/paso2.png}
 \caption{segundo intento}\label{intento2}
 \end{figure}
-Iniciar con el primer elemento buscando en la tabla referenciada en caso de que exista pasar al siguiente elemento caso contrario listar en una lista de los elementos no encontrados,pasar a ver la Figura \ref{intento3}. 
+Iniciar con el primer elemento buscando en la tabla referenciada en caso de que exista pasar al siguiente elemento caso contrario listar en una lista de los elementos no encontrados, pasar a ver la Figura \ref{intento3}. 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{images/paso3.png}
